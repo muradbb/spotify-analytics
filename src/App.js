@@ -1,22 +1,57 @@
-import React from 'react';
+/* eslint-disable */
+import React, { useState, useEffect} from 'react';
 import logo from './logo.svg';
 import './App.css';
 
-let appStyle={
-  bgcolor:'#2F3133'
+let dummyServerData={
+  user:{
+    name: "Tofiq",
+    playlists:[
+      {
+        name: "cool songs",
+        songs:[
+          {name: "sik", durationn:1234},
+          {name: "sik", durationn:1234},
+          {name: "sik", durationn:1234}
+        ]
+      },
+      {
+        name: "pool songs",
+        songs:[
+          {name: "sik", durationn:1234},
+          {name: "sik", durationn:1234},
+          {name: "sik", durationn:1234}
+        ]
+      },
+      {name: "tool songs",
+      songs:[
+        {name: "sik", durationn:1234},
+        {name: "sik", durationn:1234},
+        {name: "sik", durationn:1234}
+      ]
+      }
+    ]
+  }
 }
 
-function Introduction(){
+
+function Introduction(props){
+  let allSongs=props.user.playlists.reduce(
+    (songs, eachPlaylist)=>{
+      return songs.concat(eachPlaylist.songs)
+    },
+    []
+  )
   return(
     <div>
-      <h1>You have "N" playlists which is a total of "N" hours</h1>
+      <h1>Hello, {props.user.name}. You have {props.user.playlists.length} playlists which is a total of {allSongs.length} songs</h1>
     </div>
   )
 }
 
-function FavArtists(){
+function FavArtist(){
   return(
-    <div>
+    <div style={{display:'inline-block'}}>
       <img/>
       <h3>Artist name</h3>
       <ul>
@@ -31,12 +66,16 @@ function FavArtists(){
 
 
 function App() {
+ const [serverData, setServerData] = useState(dummyServerData)
   return (
-    <div style={appStyle}>
+    <div>
       <header>
-      <Introduction/>
+        <Introduction user={serverData.user}/>
       </header>
-      <FavArtists/>
+      <FavArtist/>
+      <FavArtist/>
+      <FavArtist/>
+      <FavArtist/>
     </div>
   );
 }
