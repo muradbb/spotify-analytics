@@ -4,38 +4,6 @@ import queryString from 'query-string';
 import logo from './logo.svg';
 import './App.css';
 
-let dummyServerData={
-  user:{
-    name: "Tofiq",
-    playlists:[
-      {
-        name: "cool songs",
-        songs:[
-          {name: "sik", durationn:1234},
-          {name: "sik", durationn:1234},
-          {name: "sik", durationn:1234}
-        ]
-      },
-      {
-        name: "pool songs",
-        songs:[
-          {name: "sik", durationn:1234},
-          {name: "sik", durationn:1234},
-          {name: "sik", durationn:1234}
-        ]
-      },
-      {name: "tool songs",
-      songs:[
-        {name: "sik", durationn:1234},
-        {name: "sik", durationn:1234},
-        {name: "sik", durationn:1234}
-      ]
-      }
-    ]
-  }
-}
-
-
 function Introduction(props){
   // let allSongs=props.user.playlists.reduce(
   //   (songs, eachPlaylist)=>{
@@ -45,7 +13,7 @@ function Introduction(props){
   // )
   return(
     <div>
-      <h1>Hello, {props.user.name}. You have props.user.playlists.length playlists which is a total of allSongs.length songs</h1>
+      <h1>Hello, props.user.name}. You have {props.playlists.playlists.length} playlists which is a total of allSongs.length songs</h1>
     </div>
   )
 }
@@ -68,37 +36,46 @@ function FavArtist(){
 
 function App() {
 
-  const [serverData, setServerData] = useState(
-
-
-
-  )
+  const [user, setUser] = useState()
+  const [playlists, setPlaylists] = useState()
 
   useEffect(() => {
     let parsed = queryString.parse(window.location.search);
     let accessToken = parsed.access_token;
+
+    // fetch(
+    //   'https://api.spotify.com/v1/me',{
+    //     headers:{'Authorization': 'Bearer ' + accessToken}
+    //   }
+    // ).then(
+    //   response => response.json()
+    // ).then(
+    //   data=>setUser({
+    //       name:data.display_name
+    //
+    //   })
+    // )
+
     fetch(
-      'https://api.spotify.com/v1/me',{
+      'https://api.spotify.com/v1/me/playlists',{
         headers:{'Authorization': 'Bearer ' + accessToken}
       }
     ).then(
       response => response.json()
     ).then(
-      data=>setServerData({
-        user:{
-          name:data.display_name
-        }
-      })
+      data=>setPlaylists({
+          playlists:data.items
+        })
     )
   },[])
 
 
   return (
     <div>
-      { serverData ?
+      { (user || playlists) ?
         <div>
           <header>
-            <Introduction user={serverData.user}/>
+            <Introduction user={user} playlists={playlists}/>
           </header>
           {// {serverData.user.playlists.map(
           //   (playlists)=>
