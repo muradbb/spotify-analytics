@@ -25,8 +25,8 @@ function FavArtist(){
       <h3>Artist name</h3>
       <ul>
         <li>SongName</li>
-        <li>SongName</li>
-        <li>SongName</li>
+          <li>SongName</li>
+          <li>SongName</li>
       </ul>
     </div>
   )
@@ -50,12 +50,17 @@ function App() {
       'https://api.spotify.com/v1/me/playlists',{
         headers:{'Authorization': 'Bearer ' + accessToken}
       }
-    )]).then(([userData, playlistData]) => {
+    )])
+    .then(([userData, playlistData]) => {
          return Promise.all([userData.json(), playlistData.json()])
-      }).then(([userData,playlistData])=>setServerData({
+      })
+      .then(([userData,playlistData])=>setServerData({
         user:{
           name:userData.display_name,
-          playlists:playlistData.items
+          playlists: playlistData.items.map(item => ({
+            name: item.name,
+            songs:[]
+          }))
         }
       })
     )
