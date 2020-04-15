@@ -13,7 +13,7 @@ function Introduction(props){
   // )
   return(
     <div>
-      <h1>Hello, props.user.name}. You have {props.playlists.playlists.length} playlists which is a total of allSongs.length songs</h1>
+      <h1>Hello, {props.user.name}. You have {props.user.playlists.length} playlists which is a total of allSongs.length songs</h1>
     </div>
   )
 }
@@ -36,46 +36,39 @@ function FavArtist(){
 
 function App() {
 
-  const [user, setUser] = useState()
-  const [playlists, setPlaylists] = useState()
+  const [serverData, setServerData] = useState()
 
   useEffect(() => {
-    let parsed = queryString.parse(window.location.search);
-    let accessToken = parsed.access_token;
+    let parsed = queryString.parse(window.location.search)
+    let accessToken = parsed.access_token
 
-    // fetch(
-    //   'https://api.spotify.com/v1/me',{
-    //     headers:{'Authorization': 'Bearer ' + accessToken}
-    //   }
-    // ).then(
-    //   response => response.json()
-    // ).then(
-    //   data=>setUser({
-    //       name:data.display_name
-    //
-    //   })
-    // )
-
-    fetch(
+    Promise.all([fetch(
+      'https://api.spotify.com/v1/me',{
+        headers:{'Authorization': 'Bearer ' + accessToken}
+      }
+    ),fetch(
       'https://api.spotify.com/v1/me/playlists',{
         headers:{'Authorization': 'Bearer ' + accessToken}
       }
-    ).then(
-      response => response.json()
-    ).then(
-      data=>setPlaylists({
-          playlists:data.items
-        })
+    )]).then(([userData, playlistData]) => {
+         return Promise.all([userData.json(), playlistData.json()])
+      }).then(([userData,playlistData])=>setServerData({
+        user:{
+          name:userData.display_name,
+          playlists:playlistData.items
+        }
+      })
     )
+
   },[])
 
 
   return (
     <div>
-      { (user || playlists) ?
+      { serverData ?
         <div>
           <header>
-            <Introduction user={user} playlists={playlists}/>
+            <Introduction user={serverData.user}/>
           </header>
           {// {serverData.user.playlists.map(
           //   (playlists)=>
