@@ -5,15 +5,16 @@ import logo from './logo.svg';
 import './App.css';
 
 function Introduction(props){
-  // let allSongs=props.user.playlists.reduce(
-  //   (songs, eachPlaylist)=>{
-  //     return songs.concat(eachPlaylist.songs)
-  //   },
-  //   []
-  // )
+  let allSongs=props.user.playlists.reduce(
+    (songCount, eachPlaylist)=>{
+      return songCount.concat(eachPlaylist.songCount)
+    },
+    []
+  )
+  let totalSongs=allSongs.reduce((accumulator, currentValue) => accumulator + currentValue)
   return(
     <div>
-      <h1>Hello, {props.user.name}. You have {props.user.playlists.length} playlists which is a total of allSongs.length songs</h1>
+      <h1>Hello, {props.user.name}. You have {props.user.playlists.length} playlists which is a total of {totalSongs}.</h1>
     </div>
   )
 }
@@ -46,7 +47,9 @@ function App() {
       'https://api.spotify.com/v1/me',{
         headers:{'Authorization': 'Bearer ' + accessToken}
       }
+      //we are first fetching the user data
     ),fetch(
+      //and here we are fetching the playlists of the user
       'https://api.spotify.com/v1/me/playlists',{
         headers:{'Authorization': 'Bearer ' + accessToken}
       }
@@ -54,13 +57,17 @@ function App() {
     .then(([userData, playlistData]) => {
          return Promise.all([userData.json(), playlistData.json()])
       })
-      .then(([userData,playlistData])=>setServerData({
+      .then(([userData,playlistData])=>
+      setServerData({
         user:{
           name:userData.display_name,
-          playlists: playlistData.items.map(item => ({
-            name: item.name,
-            songs:[]
-          }))
+          //mapping the names of the playlists into corresponding ones
+          playlists: playlistData.items.map(item => {
+          //  console.log(item.name)
+            //console.log(item.tracks.total)
+            return{name: item.name,
+            songCount: item.tracks.total}
+          })
         }
       })
     )
