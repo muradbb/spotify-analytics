@@ -144,7 +144,7 @@ function App() {
             serverData.user.favArtists.shortTerm.map(artist=>
             <FavArtist artist={artist}/>)
           }
-          )
+
         </div> :
         <button onClick={() => {
             window.location = window.location.href.includes('localhost')
