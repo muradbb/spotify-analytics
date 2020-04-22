@@ -82,3 +82,6 @@ html, body{
   color: white;
   transform: rotateY(180deg);
 }
+.songBlock{
+  display: inline-block;
+}

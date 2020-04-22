@@ -5,6 +5,8 @@ import logo from './logo.svg';
 import './App.css';
 
 
+
+
 function Introduction(props){
   //putting all song counts in a list
   let allSongs=props.user.playlists.reduce(
@@ -53,10 +55,17 @@ function FavArtist(props){
 }
 
 function FavTracks(props){
+  const [isOpen, setIsOpen] = useState(false)
+  const toggle = () => setIsOpen(!isOpen)
   return(
-    <div>
-     Tracks:{props.tracks.map((track,index)=>" "+index+"."+track.name + ",")}
+    <div className="songBlock">      
+      <ul>
+        Tracks:{props.tracks.map((track,index)=><li>{" "+(index+1)+"."+track.name+" - "+track.artist}</li>)}
+      </ul>
     </div>
+
+
+
   )
 }
 
@@ -165,17 +174,23 @@ function App() {
           favTracks:{
             longTerm:favTracksLT.items.map(item => {
               return{
-                name: item.name
+                name: item.name,
+                artist:item.artists[0].name,
+                album:item.album.name
               }
             },[]),
             mediumTerm:favTracksMT.items.map(item => {
               return{
-                name: item.name
+                name: item.name,
+                artist:item.artists[0].name,
+                album:item.album.name
               }
             },[]),
             shortTerm:favTracksST.items.map(item => {
               return{
-                name: item.name
+                name: item.name,
+                artist:item.artists[0].name,
+                album:item.album.name
               }
             },[]),
 
