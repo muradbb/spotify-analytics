@@ -37,21 +37,28 @@ function FavArtist(props){
     <div className="flip-card">
      <div className="flip-card-inner">
         <div className="flip-card-front">
-           <img src={props.artist.imageUrl} style={{width:'250px' ,height:'250px'}}/>
+           <img src={props.artist.imageUrl} style={{width:'220px' ,height:'220px'}}/>
         </div>
         <div className="flip-card-back">
-           <h1>{props.artist.name}</h1>
+           <h2>{props.artist.name}</h2>
            <p>Followers: {props.artist.followers}</p>
-           <p>Genres:{props.artist.genres.map(
+           <p>Genres:{props.artist.genres.length>0 ? props.artist.genres.map(
                (genre,index)=>" "+capitalize(genre)+(index < props.artist.genres.length - 1 ? ',' : '.')
-             )}</p>
-           <p>Popularity:{props.artist.popularity}</p> 
+             ) : " No genres available for this artist"}</p>
+           <p>Popularity:{props.artist.popularity}</p>
         </div>
      </div>
     </div>
   )
 }
 
+function FavTracks(props){
+  return(
+    <div>
+     Tracks:{props.tracks.map((track,index)=>" "+index+"."+track.name + ",")}
+    </div>
+  )
+}
 
 
 function App() {
@@ -91,12 +98,29 @@ function App() {
           headers:{'Authorization': 'Bearer ' + accessToken}
         }
       )
+      //the folloewing 3 fetches are user's top tracks in the above order
+      ,fetch(
+        'https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=50',{
+          headers:{'Authorization': 'Bearer ' + accessToken}
+        }
+      )
+      ,fetch(
+        'https://api.spotify.com/v1/me/top/tracks?time_range=medium_term&limit=50',{
+          headers:{'Authorization': 'Bearer ' + accessToken}
+        }
+      )
+      ,fetch(
+        'https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=50',{
+          headers:{'Authorization': 'Bearer ' + accessToken}
+        }
+      )
     ])
-    .then(([userData, playlistData,favArtistDataLT,favArtistDataMT,favArtistDataST]) => {
+    .then(([userData, playlistData,favArtistDataLT,favArtistDataMT,favArtistDataST,favTracksLT,favTracksMT,favTracksST]) => {
          return Promise.all([userData.json(), playlistData.json()
-           ,favArtistDataLT.json(),favArtistDataMT.json(),favArtistDataST.json()])
+           ,favArtistDataLT.json(),favArtistDataMT.json(),favArtistDataST.json()
+           ,favTracksLT.json(),favTracksMT.json(),favTracksST.json()])
       })
-      .then(([userData,playlistData,favArtistDataLT,favArtistDataMT,favArtistDataST])=>
+      .then(([userData,playlistData,favArtistDataLT,favArtistDataMT,favArtistDataST,favTracksLT,favTracksMT,favTracksST])=>
       setServerData({
         user:{
           name:userData.display_name,
@@ -137,6 +161,24 @@ function App() {
 
               }
             },[])
+          },
+          favTracks:{
+            longTerm:favTracksLT.items.map(item => {
+              return{
+                name: item.name
+              }
+            },[]),
+            mediumTerm:favTracksMT.items.map(item => {
+              return{
+                name: item.name
+              }
+            },[]),
+            shortTerm:favTracksST.items.map(item => {
+              return{
+                name: item.name
+              }
+            },[]),
+
           }
         }
       })
@@ -152,6 +194,7 @@ function App() {
            <header>
              <Introduction user={serverData.user}/>
            </header>
+           <div className="FavArtists">
            <h2>Your all time favourite </h2>
            {
              serverData.user.favArtists.longTerm.map(artist=>
@@ -167,7 +210,16 @@ function App() {
              serverData.user.favArtists.shortTerm.map(artist=>
              <FavArtist artist={artist}/>)
            }
-           )
+         </div>
+         <div className="FavTracks">
+           <h2>Your all time favourite tracks</h2>
+             <FavTracks tracks={serverData.user.favTracks.longTerm}/>
+           <h2>Your medium time favourite tracks </h2>
+             <FavTracks tracks={serverData.user.favTracks.mediumTerm}/>
+           <h2>Your recent time favourite tracks</h2>
+             <FavTracks tracks={serverData.user.favTracks.shortTerm}/>
+
+         </div>
         </div> :
         <button onClick={() => {
             window.location = window.location.href.includes('localhost')
@@ -178,7 +230,7 @@ function App() {
         }
 
     </div>
-  );
+  )
 }
 
 export default App;
