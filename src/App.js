@@ -3,6 +3,9 @@ import React, { useState, useEffect} from 'react';
 import queryString from 'query-string';
 import logo from './logo.svg';
 import './App.css';
+import Collapsible from 'react-collapsible';
+
+
 
 
 
@@ -18,8 +21,6 @@ function Introduction(props){
   //and then adding them together
   let totalSongs=allSongs.reduce((accumulator, currentValue) => accumulator + currentValue)
   return(
-
-
     <div>
       <h1>
         Hello, {props.user.name}. You have {props.user.playlists.length} playlists which is a total of {totalSongs} songs.
@@ -54,18 +55,16 @@ function FavArtist(props){
   )
 }
 
+
+
 function FavTracks(props){
-  const [isOpen, setIsOpen] = useState(false)
-  const toggle = () => setIsOpen(!isOpen)
   return(
-    <div className="songBlock">      
-      <ul>
-        Tracks:{props.tracks.map((track,index)=><li>{" "+(index+1)+"."+track.name+" - "+track.artist}</li>)}
-      </ul>
+    <div className="songBlock">
+        <ol>
+          {props.tracks.map((track)=><li>{" "+track.name+" - "+track.artist}</li>)}
+        </ol>
+
     </div>
-
-
-
   )
 }
 
@@ -227,13 +226,15 @@ function App() {
            }
          </div>
          <div className="FavTracks">
-           <h2>Your all time favourite tracks</h2>
+          <Collapsible trigger="Your all time favourite tracks">
              <FavTracks tracks={serverData.user.favTracks.longTerm}/>
-           <h2>Your medium time favourite tracks </h2>
+          </Collapsible>
+          <Collapsible trigger="Your favourite tracks for the last 6 months">
              <FavTracks tracks={serverData.user.favTracks.mediumTerm}/>
-           <h2>Your recent time favourite tracks</h2>
+          </Collapsible>
+          <Collapsible trigger="Your favourite tracks for the last 4 weeks">
              <FavTracks tracks={serverData.user.favTracks.shortTerm}/>
-
+          </Collapsible>
          </div>
         </div> :
         <button onClick={() => {

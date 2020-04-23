@@ -82,6 +82,76 @@ html, body{
   color: white;
   transform: rotateY(180deg);
 }
-.songBlock{
-  display: inline-block;
+
+li{
+  text-align: center;
+  color:white;
+  background-color: grey;
+  margin:1px;
+}
+
+ol{
+  text-align: left;
+}
+
+.Collapsible {
+  background-color:#424242 ;
+  width: 450px;
+  margin: 5px;
+  cursor: pointer;
+
+}
+
+
+.Collapsible__contentInner {
+  padding: 10px;
+  border: 1px solid $lightGrey;
+  border-top: 0;
+}
+
+.Collapsible__trigger {
+  display: block;
+  font-weight: 400;
+  text-decoration: none;
+  color: $grey;
+  position: relative;
+  border: 1px solid white;
+  padding: 10px;
+  background: $cyan;
+  color: white;
+  }
+.Collapsible__trigger:after {
+    content: '>';
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    display: block;
+    transition: transform 300ms;}
+
+.Collapsible__trigger.is-open:after {
+      transform: rotateZ(90deg);
+  }
+
+  &.is-disabled {
+    opacity: 0.5;
+    background-color: grey;
+  }
+
+
+.CustomTriggerCSS {
+  background-color: lightcoral;
+  transition: background-color 200ms ease;
+
+
+}
+
+.CustomTriggerCSS--open {
+  background-color: darkslateblue;
+}
+
+.Collapsible__custom-sibling {
+  padding: 5px;
+  font-size: 12px;
+  background-color: #CBB700;
+  color: black;
 }
