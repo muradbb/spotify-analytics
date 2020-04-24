@@ -4,11 +4,14 @@ import queryString from 'query-string';
 import logo from './logo.svg';
 import './App.css';
 import Collapsible from 'react-collapsible';
+import { Chart } from "react-google-charts";
 
 
-
-
-
+var randomColor = require('randomcolor')
+const capitalize = (s) => {
+  if (typeof s !== 'string') return ''
+  return s.charAt(0).toUpperCase() + s.slice(1)
+}
 
 function Introduction(props){
   //putting all song counts in a list
@@ -30,12 +33,6 @@ function Introduction(props){
 }
 
 function FavArtist(props){
-
-  const capitalize = (s) => {
-    if (typeof s !== 'string') return ''
-    return s.charAt(0).toUpperCase() + s.slice(1)
-  }
-
   return(
     <div className="flip-card">
      <div className="flip-card-inner">
@@ -63,8 +60,76 @@ function FavTracks(props){
         <ol>
           {props.tracks.map((track)=><li>{" "+track.name+" - "+track.artist}</li>)}
         </ol>
-
     </div>
+  )
+}
+
+function UserTrends(props){
+
+  function getOcurrences(list,value){
+    return list.filter((v) => (v === value)).length
+  }
+  let allLTgenres=props.LTartists.reduce(
+    (genres,artist)=> {return genres.concat(artist.genres)},[])
+  let allMTgenres=props.MTartists.reduce(
+    (genres,artist)=> {return genres.concat(artist.genres)},[])
+  let allSTgenres=props.STartists.reduce(
+    (genres,artist)=> {return genres.concat(artist.genres)},[])
+  function ocurrenceSort(a,b){
+    return b.percentage-a.percentage
+  }
+  let LTgenrePercentages=[...(new Set(allLTgenres))].map(item=>{
+    return{
+      title:capitalize(item),
+      value:getOcurrences(allLTgenres,item)
+      //Math.round(((getOcurrences(allLTgenres,item)/allLTgenres.length)*100)*100)/100,
+    }
+  })
+  let MTgenrePercentages=[...(new Set(allMTgenres))].map(item=>{
+    return{
+      title:item,
+      value:Math.round(((getOcurrences(allLTgenres,item)/allLTgenres.length)*100)*100)/100,
+    }
+  })
+  let STgenrePercentages=[...(new Set(allSTgenres))].map(item=>{
+    return{
+      title:item,
+      value:Math.round(((getOcurrences(allLTgenres,item)/allLTgenres.length)*100)*100)/100,
+    }
+  })
+
+  LTgenrePercentages.sort(ocurrenceSort)
+//  console.log([LTgenrePercentages.map(item=>[item.title,item.value])][0])
+//console.log(LTgenrePercentages.map(item=>[item.title,item.value]))
+  let chartData=([["genre","value"]
+])
+
+  LTgenrePercentages.slice(0,30).map(item=>chartData.push([item.title,item.value]))
+  console.log(chartData)
+  return(
+    <div className="PieChartt">
+      <h3>This is a Pie Chart for the genres you listen to</h3>
+      <Chart
+        width={'800px'}
+        height={'600px'}
+        chartType="PieChart"
+        loader={<div>Loading Chart</div>}
+        data={chartData}
+        options={{
+          backgroundColor: { fill:'transparent' },
+          chartArea: {'width': '100%', 'height': '90%'},
+          legend:{
+            position: 'labeled',
+      labeledValueText: 'both',
+      textStyle: {
+          color: 'white',
+          fontSize: 14
+          }
+        }}}
+        rootProps={{ 'data-testid': '1' }}
+      />
+    </div>
+
   )
 }
 
@@ -92,17 +157,17 @@ function App() {
       )
       //the following 3 fetches are user's top artists in long medium and short term in that order
       ,fetch(
-        'https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=5',{
+        'https://api.spotify.com/v1/me/top/artists?time_range=long_term&limit=50',{
           headers:{'Authorization': 'Bearer ' + accessToken}
         }
       )
       ,fetch(
-        'https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=5',{
+        'https://api.spotify.com/v1/me/top/artists?time_range=medium_term&limit=50',{
           headers:{'Authorization': 'Bearer ' + accessToken}
         }
       )
       ,fetch(
-        'https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=5',{
+        'https://api.spotify.com/v1/me/top/artists?time_range=short_term&limit=50',{
           headers:{'Authorization': 'Bearer ' + accessToken}
         }
       )
@@ -138,7 +203,7 @@ function App() {
               name: item.name,
               songCount: item.tracks.total
             }
-          },[]),
+          }),
           favArtists:{
             longTerm:favArtistDataLT.items.map(item => {
               return{
@@ -149,7 +214,7 @@ function App() {
                 popularity:item.popularity
 
               }
-            },[]),
+            }),
             mediumTerm:favArtistDataMT.items.map(item => {
               return{
                 name: item.name,
@@ -158,7 +223,7 @@ function App() {
                 followers:item.followers.total,
                 popularity:item.popularity
               }
-            },[]),
+            }),
             shortTerm:favArtistDataST.items.map(item => {
               return{
                 name: item.name,
@@ -166,9 +231,8 @@ function App() {
                 genres: item.genres,
                 followers:item.followers.total,
                 popularity:item.popularity
-
               }
-            },[])
+            })
           },
           favTracks:{
             longTerm:favTracksLT.items.map(item => {
@@ -177,27 +241,26 @@ function App() {
                 artist:item.artists[0].name,
                 album:item.album.name
               }
-            },[]),
+            }),
             mediumTerm:favTracksMT.items.map(item => {
               return{
                 name: item.name,
                 artist:item.artists[0].name,
                 album:item.album.name
               }
-            },[]),
+            }),
             shortTerm:favTracksST.items.map(item => {
               return{
                 name: item.name,
                 artist:item.artists[0].name,
                 album:item.album.name
               }
-            },[]),
+            }),
 
           }
         }
       })
     )
-
   },[])
 
 
@@ -211,17 +274,17 @@ function App() {
            <div className="FavArtists">
            <h2>Your all time favourite </h2>
            {
-             serverData.user.favArtists.longTerm.map(artist=>
+             serverData.user.favArtists.longTerm.slice(0,5).map(artist=>
              <FavArtist artist={artist}/>)
            }
            <h2>Your medium time favourite </h2>
            {
-             serverData.user.favArtists.mediumTerm.map(artist=>
+             serverData.user.favArtists.mediumTerm.slice(0,5).map(artist=>
              <FavArtist artist={artist}/>)
            }
            <h2>Your recent time favourite </h2>
            {
-             serverData.user.favArtists.shortTerm.map(artist=>
+             serverData.user.favArtists.shortTerm.slice(0,5).map(artist=>
              <FavArtist artist={artist}/>)
            }
          </div>
@@ -236,6 +299,9 @@ function App() {
              <FavTracks tracks={serverData.user.favTracks.shortTerm}/>
           </Collapsible>
          </div>
+         <UserTrends LTartists={serverData.user.favArtists.longTerm}
+           MTartists={serverData.user.favArtists.mediumTerm}
+           STartists={serverData.user.favArtists.shortTerm}/>
         </div> :
         <button onClick={() => {
             window.location = window.location.href.includes('localhost')
