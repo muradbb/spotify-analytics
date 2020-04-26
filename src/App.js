@@ -173,7 +173,11 @@ function RelatedArtists(props) {
 
   const handleSubmit = (e)=>{
     e.preventDefault()
-    setArtist(searchedArtist(title))
+    if(typeof searchedArtist(title) !== 'undefined'){
+      console.log(searchedArtist(title))
+      setArtist(searchedArtist(title))
+    }
+
   }
 
   useEffect(()=>{
