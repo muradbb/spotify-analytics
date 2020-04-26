@@ -24,9 +24,7 @@ function Introduction(props) {
   return (
     <div>
       <h1>
-        Hello, {props.user.name}.You have {props.user.playlists.length}
-        playlists which is a total of {totalSongs}
-        songs.{" "}
+        Hello, {props.user.name}.You have {props.user.playlists.length} playlists which is a total of {totalSongs} songs.{" "}
       </h1>{" "}
     </div>
   );
@@ -174,10 +172,8 @@ function RelatedArtists(props) {
   const handleSubmit = (e)=>{
     e.preventDefault()
     if(typeof searchedArtist(title) !== 'undefined'){
-      console.log(searchedArtist(title))
       setArtist(searchedArtist(title))
     }
-
   }
 
   useEffect(()=>{
@@ -212,8 +208,6 @@ function RelatedArtists(props) {
       )
   },[artist]
   )
-
-
   //allArtists.forEach(item=>console.log(item.name.toLowerCase()))
   //let searchedArtist=allArtists.forEach(artist=>artist.name.toLowerCase()===title.toLowerCase)
 
@@ -221,7 +215,7 @@ function RelatedArtists(props) {
 
   return(
     <div>
-      <h2>Enter names of one of your favourite artists to get related artists to him</h2>
+      <h2>Enter names of one of your favourite artists to get related artists to them</h2>
       <form onSubmit={handleSubmit}>
         <input type="text" value={title} required onChange={(e)=> setTitle(e.target.value)}/>
         <input type="submit" value="Search"/>
@@ -239,6 +233,193 @@ function RelatedArtists(props) {
       : <p></p>}
     </div>
   )
+}
+
+function AudioFeatureTrend(props){
+
+  let avgAcousticness
+  let avgDanceability
+  let avgDuration
+  let avgEnergy
+  let avgInstrumentalness
+  let avgKey
+  let avgLiveness
+  let avgLoudness
+  let avgTempo
+  let avgValence
+
+  let readyToShow=false
+
+  let allSongIds=(props.tracks.map((track,index)=>{
+    return(track.id)
+  })).join()
+
+
+
+  const [audioFeatures,setAudioFeatures]=useState()
+
+  useEffect(() => {
+      let parsed = queryString.parse(window.location.search);
+      let accessToken = parsed.access_token;
+
+      fetch("https://api.spotify.com/v1/audio-features?ids="+allSongIds, {
+        headers: {
+          Authorization: "Bearer " + accessToken,
+        }
+      }).then(audioFeatureData=>(audioFeatureData.json())).then(
+        audioFeatureData=>{
+          setAudioFeatures(audioFeatureData.audio_features.map(item=>{
+            return{
+              acousticness:item.acousticness,
+              danceability:item.danceability,
+              duration:item.duration_ms,
+              energy:item.energy,
+              instrumentalness:item.instrumentalness,
+              key:item.key,
+              liveness:item.liveness,
+              loudness:item.loudness,
+              tempo:item.tempo,
+              valence:item.valence
+            }
+          }))
+        }
+      )
+  }, [])
+
+  function avg(list){
+    return ((list.reduce(
+      (accumulator, currentValue) => accumulator + currentValue
+    ))/list.length)
+  }
+
+
+  if(typeof audioFeatures !== 'undefined'){
+
+    let allAcousticness = audioFeatures.reduce((acousticness, eachTrack) => {
+      return acousticness.concat(eachTrack.acousticness)
+    }, [])
+
+    let allDanceability = audioFeatures.reduce((danceability, eachTrack) => {
+      return danceability.concat(eachTrack.danceability)
+    }, [])
+
+    let allDuration = audioFeatures.reduce((duration, eachTrack) => {
+      return duration.concat(eachTrack.duration)
+    }, [])
+
+    let allEnergy = audioFeatures.reduce((energy, eachTrack) => {
+      return energy.concat(eachTrack.energy)
+    }, [])
+
+    let allInstrumentalness = audioFeatures.reduce((instrumentalness, eachTrack) => {
+      return instrumentalness.concat(eachTrack.instrumentalness)
+    }, [])
+
+    let allKey = audioFeatures.reduce((key, eachTrack) => {
+      return key.concat(eachTrack.key)
+    }, [])
+
+    let allLiveness = audioFeatures.reduce((liveness, eachTrack) => {
+      return liveness.concat(eachTrack.liveness)
+    }, [])
+
+    let allLoudness = audioFeatures.reduce((loudness, eachTrack) => {
+      return loudness.concat(eachTrack.loudness)
+    }, [])
+
+    let allTempo = audioFeatures.reduce((tempo, eachTrack) => {
+      return tempo.concat(eachTrack.tempo)
+    }, [])
+
+    let allValence = audioFeatures.reduce((valence, eachTrack) => {
+      return valence.concat(eachTrack.valence)
+    }, [])
+
+    avgAcousticness=avg(allAcousticness)
+    avgDanceability=avg(allDanceability)
+    avgDuration=avg(allDuration)
+    avgEnergy=avg(allEnergy)
+    avgInstrumentalness=avg(allInstrumentalness)
+    avgKey=avg(allKey)
+    avgLiveness=avg(allLiveness)
+    avgLoudness=avg(allLoudness)
+    avgTempo=avg(allTempo)
+    avgValence=avg(allValence)
+
+    readyToShow=true
+    console.log(avgKey)
+  }
+
+  function acousticnessDecision(acousticness){
+    if(acousticness<=0.4){
+      return ("You are more into electric sounds (think electric guitars, synthesizers, drum machines, auto-tuned vocals and so on).")
+    }else if(acousticness<=0.6){
+      return "You like both natural acoustic sounds (think acoustic guitar, piano, orchestra, the unprocessed human voice) and electric sounds (think electric guitars, synthesizers, drum machines, auto-tuned vocals and so on)."
+    }else{
+      return "You are more into natural acoustic sounds (think acoustic guitar, piano, orchestra, the unprocessed human voice)."
+    }
+  }
+
+  function danceabilityDecision(danceability){
+    if(danceability<=0.4){
+      return "You are not really into danceable songs."
+    }else if(danceability<=0.6){
+      return "You like both calm and danceable songs."
+    }else{
+      return "You are more into danceable songs."
+    }
+  }
+
+  function toHumanTime(duration){
+    let mins=Math.floor((duration/1000)/60)
+    let seconds=Math.floor((duration/1000)%60)
+
+    return (mins+" minutes and "+seconds+" seconds")
+  }
+
+  function energyDecision(energy){
+    if(energy<=0.4){
+      return "You seem to be more into more calm and chill songs."
+    }else if(energy<=0.6){
+      return "You like both calm and energetic songs."
+    }else{
+      return "You are more into high energy songs."
+    }
+  }
+
+
+
+
+    // .reduce(
+    //   (accumulator, currentValue) => accumulator + currentValue
+    // )
+
+  return(
+
+    <div>
+      <h2>Your averages</h2>
+    {(typeof audioFeatures !== 'undefined') ?
+
+    (<div>
+        <p>{acousticnessDecision(avgAcousticness)} Your exact acousticness score is {avgAcousticness} highest point being 1.0</p>
+        <p>{danceabilityDecision(avgDanceability)} Your exact danceability score is {avgDanceability} highest point being 1.0.
+          The higher the value, the easier it is to dance to the song.</p>
+        <p>Average duration for your favourite songs is {toHumanTime(avgDuration)}</p>
+        <p>{energyDecision(avgEnergy)} Your exact danceability score is {avgEnergy} highest point being 1.0.</p>
+        <p>instrumentalness: {avgInstrumentalness}</p>
+        <p>liveness: {avgLiveness}</p>
+        <p>loudness: {avgLoudness}</p>
+        <p>Average BPM for you favourite songs is {Math.floor(avgTempo)}</p>
+        <p>Your valence score is {avgValence}. Tracks with high valence sound more positive (happy, cheerful, euphoric), wh
+          ile tracks with low valence sound more negative (sad, depressed, angry).</p>
+
+    </div>)
+    : (<div>
+        <p>Loading...</p>
+      </div>)}
+    </div>
+  )
+
 }
 
 function App() {
@@ -398,6 +579,7 @@ function App() {
                     name: item.name,
                     artist: item.artists[0].name,
                     album: item.album.name,
+                    id: item.id
                   };
                 }),
                 mediumTerm: favTracksMT.items.map((item) => {
@@ -412,6 +594,7 @@ function App() {
                     name: item.name,
                     artist: item.artists[0].name,
                     album: item.album.name,
+                    id: item.id
                   };
                 }),
               },
@@ -464,6 +647,7 @@ function App() {
             STartists={serverData.user.favArtists.shortTerm}
           />
             <RelatedArtists artists={serverData.user.favArtists}/>
+            <AudioFeatureTrend tracks={serverData.user.favTracks.shortTerm}/>
         </div>
       ) : (
         <button
