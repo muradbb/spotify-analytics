@@ -217,7 +217,7 @@ function RelatedArtists(props) {
   //console.log(searchedArtist("gorillaz"))
 
   return(
-    <div style={{backgroundColor:'', margin:'auto'}}>
+    <div style={{backgroundColor:'', margin:'auto', marginBottom:'60px'}}>
       <h2 style={{textAlign:'center'}}>Enter names of one of your favourite artists to get related artists to them</h2>
       <form onSubmit={handleSubmit} style={{height:'40px', width:'50%', marginLeft:'27%', marginBottom:'20px'}}>
         <input type="text" value={title} required onChange={(e)=> setTitle(e.target.value)} style={{fontSize:'40px'}}/>
