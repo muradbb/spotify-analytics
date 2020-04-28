@@ -21,9 +21,10 @@ function Introduction(props) {
   let totalSongs = allSongs.reduce(
     (accumulator, currentValue) => accumulator + currentValue
   );
+
   return (
-    <div>
-      <h1>
+    <div style={{color:'#FFA07A'}}>
+      <h1 style={{textAlign:'center'}}>
         Hello, {props.user.name}.You have {props.user.playlists.length} playlists which is a total of {totalSongs} songs.{" "}
       </h1>{" "}
     </div>
@@ -32,6 +33,7 @@ function Introduction(props) {
 
 function FavArtist(props) {
   return (
+    <div style={{display:'inline-block', backgroundColor:'#FFA07A', marginLeft:'1.5%'}}>
     <div className="flip-card">
       <div className="flip-card-inner">
         <div className="flip-card-front">
@@ -44,7 +46,7 @@ function FavArtist(props) {
           />{" "}
         </div>{" "}
         <div className="flip-card-back">
-          <h2> {props.artist.name} </h2>{" "}
+          <h2 style={{color:'white'}}> {props.artist.name} </h2>{" "}
           <p> Followers: {props.artist.followers} </p>{" "}
           <p>
             {" "}
@@ -62,6 +64,7 @@ function FavArtist(props) {
         </div>{" "}
       </div>{" "}
     </div>
+  </div>
   );
 }
 
@@ -123,7 +126,7 @@ function UserTrends(props) {
   );
   return (
     <div className="PieChartt">
-      <h3> This is a Pie Chart for the genres you listen to </h3>{" "}
+      <h2 style={{textAlign:'center'}}> Your Genre Pie Chart </h2>{" "}
       <Chart
         width={"800px"}
         height={"600px"}
@@ -214,11 +217,11 @@ function RelatedArtists(props) {
   //console.log(searchedArtist("gorillaz"))
 
   return(
-    <div>
-      <h2>Enter names of one of your favourite artists to get related artists to them</h2>
-      <form onSubmit={handleSubmit}>
-        <input type="text" value={title} required onChange={(e)=> setTitle(e.target.value)}/>
-        <input type="submit" value="Search"/>
+    <div style={{backgroundColor:'', margin:'auto'}}>
+      <h2 style={{textAlign:'center'}}>Enter names of one of your favourite artists to get related artists to them</h2>
+      <form onSubmit={handleSubmit} style={{height:'40px', width:'50%', marginLeft:'27%', marginBottom:'20px'}}>
+        <input type="text" value={title} required onChange={(e)=> setTitle(e.target.value)} style={{fontSize:'40px'}}/>
+        <input type="submit" value="Go!" style={{fontSize:'40px'}}/>
       </form>
       {relatedArtists ?
       (
@@ -388,29 +391,20 @@ function AudioFeatureTrend(props){
   }
 
 
-
-
-    // .reduce(
-    //   (accumulator, currentValue) => accumulator + currentValue
-    // )
-
   return(
 
-    <div>
-      <h2>Your averages</h2>
+    <div className="AudioFeatures">
+      <h2 style={{border:'solid' , width:'40%', margin:'auto', marginTop:'5px'}}>Audio trends for your top 50 tracks</h2>
     {(typeof audioFeatures !== 'undefined') ?
 
     (<div>
-        <p>{acousticnessDecision(avgAcousticness)} Your exact acousticness score is {avgAcousticness} highest point being 1.0</p>
-        <p>{danceabilityDecision(avgDanceability)} Your exact danceability score is {avgDanceability} highest point being 1.0.
+        <p>{acousticnessDecision(avgAcousticness)} Your exact acousticness score is {(Math.floor(avgAcousticness*1000))/1000} highest point being 1.0</p>
+        <p>{danceabilityDecision(avgDanceability)} Your exact danceability score is {(Math.floor(avgDanceability*1000))/1000} highest point being 1.0.
           The higher the value, the easier it is to dance to the song.</p>
         <p>Average duration for your favourite songs is {toHumanTime(avgDuration)}</p>
-        <p>{energyDecision(avgEnergy)} Your exact danceability score is {avgEnergy} highest point being 1.0.</p>
-        <p>instrumentalness: {avgInstrumentalness}</p>
-        <p>liveness: {avgLiveness}</p>
-        <p>loudness: {avgLoudness}</p>
+        <p>{energyDecision(avgEnergy)} Your exact danceability score is {(Math.floor(avgEnergy*1000))/1000} highest point being 1.0.</p>
         <p>Average BPM for you favourite songs is {Math.floor(avgTempo)}</p>
-        <p>Your valence score is {avgValence}. Tracks with high valence sound more positive (happy, cheerful, euphoric), wh
+        <p>Your valence score is {(Math.floor(avgValence*1000))/1000}. Tracks with high valence sound more positive (happy, cheerful, euphoric), wh
           ile tracks with low valence sound more negative (sad, depressed, angry).</p>
 
     </div>)
@@ -421,6 +415,8 @@ function AudioFeatureTrend(props){
   )
 
 }
+
+
 
 function App() {
   const [serverData, setServerData] = useState()
@@ -612,15 +608,15 @@ function App() {
             <Introduction user={serverData.user} />{" "}
           </header>{" "}
           <div className="FavArtists">
-            <h2> Your all time favourite </h2>{" "}
+            <h2 style={{textAlign:'center'}}> Your all time favourite artists </h2>{" "}
             {serverData.user.favArtists.longTerm.slice(0, 5).map((artist) => (
               <FavArtist artist={artist} />
             ))}{" "}
-            <h2> Your medium time favourite </h2>{" "}
+            <h2> Your favourite artists for the last 6 months </h2>{" "}
             {serverData.user.favArtists.mediumTerm.slice(0, 5).map((artist) => (
               <FavArtist artist={artist} />
             ))}{" "}
-            <h2> Your recent time favourite </h2>{" "}
+            <h2> Your favourite artists for the last 4 weeks </h2>{" "}
             {serverData.user.favArtists.shortTerm.slice(0, 5).map((artist) => (
               <FavArtist artist={artist} />
             ))}{" "}
@@ -647,7 +643,7 @@ function App() {
             STartists={serverData.user.favArtists.shortTerm}
           />
             <RelatedArtists artists={serverData.user.favArtists}/>
-            <AudioFeatureTrend tracks={serverData.user.favTracks.shortTerm}/>
+            <AudioFeatureTrend tracks={serverData.user.favTracks.longTerm}/>
         </div>
       ) : (
         <button

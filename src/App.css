@@ -1,5 +1,12 @@
 html, body{
-  background-color: gray;
+  background-color: #2a1e4e;
+  color:#FFA07A;
+
+}
+
+h2{
+  color:#CD5C5C;
+  text-align: center;
 }
 
 .App {
@@ -84,29 +91,33 @@ html, body{
 }
 
 li{
-  text-align: center;
+
   color:white;
-  background-color: grey;
-  margin:1px;
-}
+  background-color: 2a1e4e;
+  left: 30px;
+  padding-left: 0;
+  margin-bottom: 2px;
+
+  }
 
 ol{
-  text-align: left;
+  padding-left: 20px;
+  padding-right: 10px;
+
 }
 
 .Collapsible {
-  background-color:#424242 ;
+  background-color:#0b525b ;
   width: 350px;
   margin: 5px;
   cursor: pointer;
-
 }
 
 
 .Collapsible__contentInner {
-  padding: 10px;
-  border: 1px solid $lightGrey;
+  border: 1px #FFA07A;
   border-top: 0;
+  left: 30px;
 }
 
 .Collapsible__trigger {
@@ -154,11 +165,22 @@ ol{
 .Collapsible__custom-sibling {
   padding: 5px;
   font-size: 12px;
-  background-color: #CBB700;
+  background-color: #FFA07A;
   color: black;
 }
+
 .PieChartt{
   margin: auto;
   width: 50%;
   padding: 10px;
+}
+
+.AudioFeatures{
+  text-align: center;
+  border-style: solid;
+  margin-top: 30px;
+  border-radius: 15px;
+  font-size: 20px;
+  width:98%;
+  margin:auto;
 }
