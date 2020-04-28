@@ -32,6 +32,13 @@ function Introduction(props) {
 }
 
 function FavArtist(props) {
+
+  let genreString=props.artist.genres.slice(0,5).map((genre, index) =>
+        " " +
+        capitalize(genre) +
+        ((index < props.artist.genres.slice(0,5).length - 1) ? "," : ".")
+    )
+
   return (
     <div style={{display:'inline-block', backgroundColor:'#FFA07A', marginLeft:'1.5%'}}>
     <div className="flip-card">
@@ -50,15 +57,10 @@ function FavArtist(props) {
           <p> Followers: {props.artist.followers} </p>{" "}
           <p>
             {" "}
-            Genres:{" "}
+            Genres:
             {props.artist.genres.length > 0
-              ? props.artist.genres.map(
-                  (genre, index) =>
-                    " " +
-                    capitalize(genre) +
-                    (index < props.artist.genres.length - 1 ? "," : ".")
-                )
-              : " No genres available for this artist"}{" "}
+              ? (genreString)
+              : " No genres available for this artist"}
           </p>{" "}
           <p> Popularity: {props.artist.popularity} </p>{" "}
         </div>{" "}
@@ -349,8 +351,6 @@ function AudioFeatureTrend(props){
     avgTempo=avg(allTempo)
     avgValence=avg(allValence)
 
-    readyToShow=true
-    console.log(avgKey)
   }
 
   function acousticnessDecision(acousticness){
@@ -398,13 +398,13 @@ function AudioFeatureTrend(props){
     {(typeof audioFeatures !== 'undefined') ?
 
     (<div>
-        <p>{acousticnessDecision(avgAcousticness)} Your exact acousticness score is {(Math.floor(avgAcousticness*1000))/1000} highest point being 1.0</p>
-        <p>{danceabilityDecision(avgDanceability)} Your exact danceability score is {(Math.floor(avgDanceability*1000))/1000} highest point being 1.0.
+        <p>{acousticnessDecision(avgAcousticness)} Your average acousticness score is {(Math.floor(avgAcousticness*1000))/1000} highest possible point being 1.0</p>
+        <p>{danceabilityDecision(avgDanceability)} Your average danceability score is {(Math.floor(avgDanceability*1000))/1000} highest possible point being possible 1.0.
           The higher the value, the easier it is to dance to the song.</p>
         <p>Average duration for your favourite songs is {toHumanTime(avgDuration)}</p>
-        <p>{energyDecision(avgEnergy)} Your exact danceability score is {(Math.floor(avgEnergy*1000))/1000} highest point being 1.0.</p>
+        <p>{energyDecision(avgEnergy)} Your average energy score is {(Math.floor(avgEnergy*1000))/1000} highest possible point being 1.0.</p>
         <p>Average BPM for you favourite songs is {Math.floor(avgTempo)}</p>
-        <p>Your valence score is {(Math.floor(avgValence*1000))/1000}. Tracks with high valence sound more positive (happy, cheerful, euphoric), wh
+        <p>Your average valence score is {(Math.floor(avgValence*1000))/1000}. Tracks with high valence sound more positive (happy, cheerful, euphoric), wh
           ile tracks with low valence sound more negative (sad, depressed, angry).</p>
 
     </div>)
@@ -416,6 +416,141 @@ function AudioFeatureTrend(props){
 
 }
 
+function PlaylistCreator(props){
+
+  let name="Top tracks"
+
+  let allSongURIsLT=(props.tracks.longTerm.map((track,index)=>{
+    return(track.uri)
+  })).join()
+  let allSongURIsMT=(props.tracks.mediumTerm.map((track,index)=>{
+    return(track.uri)
+  })).join()
+  let allSongURIsST=(props.tracks.shortTerm.map((track,index)=>{
+    return(track.uri)
+  })).join()
+
+
+
+  const [playlist,setPlaylist]=useState()
+  const [radioButton,setRadioButton]=useState("6 months")
+  const [songURIs,setSongURIs]=useState()
+  const [playlistName,setPlaylistName]=useState()
+
+
+
+  useEffect(() => {
+
+    let parsed = queryString.parse(window.location.search);
+    let accessToken = parsed.access_token;
+
+
+    if(typeof playlistName !== 'undefined')
+
+    fetch("https://api.spotify.com/v1/users/"+props.userID+"/playlists", {
+      method: "post",
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+      body:JSON.stringify({
+        name: playlistName,
+        description:'songs',
+        public:'true'
+      })
+    }).then(playlistData=>(playlistData.json())).then(
+      (playlistData)=>{
+        fetch("https://api.spotify.com/v1/playlists/"+playlistData.id+"/tracks?uris="+songURIs, {
+          method:'post',
+          headers: {
+            Authorization: "Bearer " + accessToken,
+          }
+        }).then(responseData=>(responseData.json())).then(
+          responseData=>{console.log("boom")}
+        )
+      }
+    )
+    // .then(
+    //     fetch("https://api.spotify.com/v1/playlists/"+playlist.id+"/tracks?uris="+songURIs, {
+    //       method:'post',
+    //       headers: {
+    //         Authorization: "Bearer " + accessToken,
+    //       }
+    //     }).then(responseData=>(responseData.json())).then(
+    //       responseData=>{console.log("boom")}
+    //     )
+    //   )
+
+
+
+  },[songURIs])
+
+
+  // useEffect(()=>{
+  //
+  //   let parsed = queryString.parse(window.location.search);
+  //   let accessToken = parsed.access_token;
+  //
+  //   // if(radioButton==='All time'){
+  //   //   setSongURIs(allSongURIsLT)
+  //   // }else if (radioButton==='6 months') {
+  //   //   setSongURIs(allSongURIsMT)
+  //   // }else{
+  //   //   setSongURIs(allSongURIsST)
+  //   // }
+  //
+  //   if(typeof playlist !== 'undefined')
+  //
+  //   fetch("https://api.spotify.com/v1/playlists/"+playlist.id+"/tracks?uris="+songURIs, {
+  //     method:'post',
+  //     headers: {
+  //       Authorization: "Bearer " + accessToken,
+  //     }
+  //   }).then(responseData=>(responseData.json())).then(
+  //     responseData=>{console.log(responseData)}
+  //   )
+  //
+  // },[songURIs])
+
+function handleSubmit(e){
+  e.preventDefault()
+  if(radioButton==='All time'){
+    setSongURIs(allSongURIsLT)
+    setPlaylistName("All time spotey")
+  }else if (radioButton==='6 months') {
+    setSongURIs(allSongURIsMT)
+    setPlaylistName("6 months spotey")
+  }else if(radioButton==="4 weeks"){
+    setSongURIs(allSongURIsST)
+    setPlaylistName("4 weeks spotey")
+  }
+
+}
+
+//make a state and use state for calling the fetch hook
+
+function handleSelect(event){
+  let a = event.target.value
+  setRadioButton(a)
+  console.log(radioButton)
+}
+
+  return(
+    <div>
+      <h2>In this section you can create playlists with your top 50 tracks from different time periods</h2>
+      <form onSubmit={handleSubmit}>
+        <select value={radioButton} onChange={handleSelect}>
+          <option>All time</option>
+          <option>6 months</option>
+          <option>4 weeks</option>
+        </select>
+        <input type="submit" value="Go!"/>
+      </form>
+    </div>
+  )
+
+
+}
+
 
 
 function App() {
@@ -423,6 +558,8 @@ function App() {
   const [searchText, setSearchText] = useState()
 
   useEffect(() => {
+
+
     let parsed = queryString.parse(window.location.search);
     let accessToken = parsed.access_token;
 
@@ -575,7 +712,8 @@ function App() {
                     name: item.name,
                     artist: item.artists[0].name,
                     album: item.album.name,
-                    id: item.id
+                    id: item.id,
+                    uri:item.uri
                   };
                 }),
                 mediumTerm: favTracksMT.items.map((item) => {
@@ -583,6 +721,9 @@ function App() {
                     name: item.name,
                     artist: item.artists[0].name,
                     album: item.album.name,
+                    id:item.id,
+                    uri:item.uri
+
                   };
                 }),
                 shortTerm: favTracksST.items.map((item) => {
@@ -590,7 +731,9 @@ function App() {
                     name: item.name,
                     artist: item.artists[0].name,
                     album: item.album.name,
-                    id: item.id
+                    id: item.id,
+                    uri:item.uri
+
                   };
                 }),
               },
@@ -644,6 +787,7 @@ function App() {
           />
             <RelatedArtists artists={serverData.user.favArtists}/>
             <AudioFeatureTrend tracks={serverData.user.favTracks.longTerm}/>
+            <PlaylistCreator userID={serverData.user.id} tracks={serverData.user.favTracks}/>
         </div>
       ) : (
         <button
@@ -654,8 +798,9 @@ function App() {
           }}
           style={{
             padding: "20px",
-            "font-size": "50px",
-            marginTop: "20px",
+            fontSize: "50px",
+            marginTop: '15%',
+            marginLeft:'33%'
           }}
         >
           {" "}
