@@ -501,7 +501,7 @@ function handleSelect(event){
     <div>
       <h2>In this section you can create playlists with your top 50 tracks from different time periods</h2>
       <div className='ChoiceBox'>
-      <p style={{fontSize:'24px', display:'inline-block'}}>Choose the preferred time period: </p>
+      <p style={{fontSize:'24px', display:'inline-block',marginRight:'5px'}}>Choose the preferred time period: </p>
       <form onSubmit={handleSubmit} style={{display:'inline-block'}}>
         <select value={radioButton} onChange={handleSelect}>
           <option>All time</option>
