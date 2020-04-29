@@ -259,6 +259,8 @@ function AudioFeatureTrend(props){
     return(track.id)
   })).join()
 
+  console.log(allSongIds)
+
 
 
   const [audioFeatures,setAudioFeatures]=useState()
@@ -469,59 +471,21 @@ function PlaylistCreator(props){
         )
       }
     )
-    // .then(
-    //     fetch("https://api.spotify.com/v1/playlists/"+playlist.id+"/tracks?uris="+songURIs, {
-    //       method:'post',
-    //       headers: {
-    //         Authorization: "Bearer " + accessToken,
-    //       }
-    //     }).then(responseData=>(responseData.json())).then(
-    //       responseData=>{console.log("boom")}
-    //     )
-    //   )
-
-
 
   },[songURIs])
 
-
-  // useEffect(()=>{
-  //
-  //   let parsed = queryString.parse(window.location.search);
-  //   let accessToken = parsed.access_token;
-  //
-  //   // if(radioButton==='All time'){
-  //   //   setSongURIs(allSongURIsLT)
-  //   // }else if (radioButton==='6 months') {
-  //   //   setSongURIs(allSongURIsMT)
-  //   // }else{
-  //   //   setSongURIs(allSongURIsST)
-  //   // }
-  //
-  //   if(typeof playlist !== 'undefined')
-  //
-  //   fetch("https://api.spotify.com/v1/playlists/"+playlist.id+"/tracks?uris="+songURIs, {
-  //     method:'post',
-  //     headers: {
-  //       Authorization: "Bearer " + accessToken,
-  //     }
-  //   }).then(responseData=>(responseData.json())).then(
-  //     responseData=>{console.log(responseData)}
-  //   )
-  //
-  // },[songURIs])
 
 function handleSubmit(e){
   e.preventDefault()
   if(radioButton==='All time'){
     setSongURIs(allSongURIsLT)
-    setPlaylistName("All time spotey")
+    setPlaylistName("All time top tracks")
   }else if (radioButton==='6 months') {
     setSongURIs(allSongURIsMT)
-    setPlaylistName("6 months spotey")
+    setPlaylistName("6 months top tracks")
   }else if(radioButton==="4 weeks"){
     setSongURIs(allSongURIsST)
-    setPlaylistName("4 weeks spotey")
+    setPlaylistName("4 weeks top tracks")
   }
 
 }
@@ -531,13 +495,14 @@ function handleSubmit(e){
 function handleSelect(event){
   let a = event.target.value
   setRadioButton(a)
-  console.log(radioButton)
 }
 
   return(
     <div>
       <h2>In this section you can create playlists with your top 50 tracks from different time periods</h2>
-      <form onSubmit={handleSubmit}>
+      <div className='ChoiceBox'>
+      <p style={{fontSize:'24px', display:'inline-block'}}>Choose the preferred time period: </p>
+      <form onSubmit={handleSubmit} style={{display:'inline-block'}}>
         <select value={radioButton} onChange={handleSelect}>
           <option>All time</option>
           <option>6 months</option>
@@ -545,13 +510,107 @@ function handleSelect(event){
         </select>
         <input type="submit" value="Go!"/>
       </form>
+      </div>
     </div>
   )
 
-
 }
 
+function RecentlyPlayed(props){
 
+  const [recentSongs,setRecentSongs]=useState()
+  const [number,setNumber]=useState()
+  const [toBeRendered,setToBeRendered]=useState(4)
+
+
+  useEffect(()=>{
+    let parsed = queryString.parse(window.location.search);
+    let accessToken = parsed.access_token;
+
+    fetch("https://api.spotify.com/v1/me/player/recently-played?limit=50", {
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      }
+    }).then(responseData=>(responseData.json())).then(
+      responseData=>{
+        setRecentSongs(responseData.items.map(item=>{
+          return{
+            playedAt:item.played_at,
+            name:item.track.name,
+            albumName:item.track.album.name,
+            duration:item.track.duration_ms,
+            image:item.track.album.images[0].url,
+            artist:item.track.artists[0].name
+          }
+        }))
+      })
+  },[])
+
+  function toHumanTime(duration){
+    let mins=Math.floor((duration/1000)/60)
+    let seconds=Math.floor((duration/1000)%60)
+
+    return (mins+":"+seconds)
+  }
+
+  function toHumanDate(date){
+    return date.substr(0,10)
+  }
+
+  function wordCutter(string){
+    return (string.length>18
+				? string.substr(0, 16).concat("...")
+				: string)
+  }
+  let liStyle={
+    paddingTop:'0px',
+    margin:'0px'
+  }
+
+  function songBox(song){
+    return(
+      <div style={{display:'inline-block', margin:'4px',  border:'3px solid #fe9b1d',
+        height:'125px', width:'300px',padding:'10px',paddingTop:'0'}}>
+        <img src={song.image} height="100" width="100" style={{marginLeft:'2px',padding:'0', marginRight:'2px'}}/>
+        <div style={{display:'inline-block', padding:'0', margin:'0'}}>
+          <ul style={{listStyleType:'none',padding:'0px'}}>
+              <li style={liStyle}>Name: {wordCutter(song.name)} </li>
+              <li style={liStyle}>Album: {wordCutter(song.albumName)}</li>
+              <li style={liStyle}>Artist: {wordCutter(song.artist)}</li>
+              <li style={liStyle}>Duration: {toHumanTime(song.duration)}</li>
+              <li style={liStyle}>Played at: {toHumanDate(song.playedAt)}</li>
+          </ul>
+        </div>
+      </div>
+    )
+  }
+
+  function handleSubmit(e){
+    e.preventDefault()
+    setToBeRendered(number)
+  }
+
+
+
+
+  return(
+    recentSongs ?
+    <div>
+      <h2>Recently played</h2>
+      <p style={{fontSize:'20px', margin:'5px',textAlign:'center'}}>Ever listened to a song on spotify then forgot the name?
+        Worry not! Just enter the number of recently
+        played songs you would like to see.</p>
+      <form onSubmit={handleSubmit} style={{marginLeft:'42%', marginBottom:'20px'}}>
+          <input type="text" value={number} required onChange={(e)=> setNumber(e.target.value)}/>
+          <input type="submit" value="Go!"/>
+        </form>
+      {recentSongs.slice(0,toBeRendered).map(song=>songBox(song))}
+    </div>
+    :<div>
+    <p>Loading...</p>
+  </div>
+  )
+}
 
 function App() {
   const [serverData, setServerData] = useState()
@@ -788,6 +847,7 @@ function App() {
             <RelatedArtists artists={serverData.user.favArtists}/>
             <AudioFeatureTrend tracks={serverData.user.favTracks.longTerm}/>
             <PlaylistCreator userID={serverData.user.id} tracks={serverData.user.favTracks}/>
+            <RecentlyPlayed/>
         </div>
       ) : (
         <button
