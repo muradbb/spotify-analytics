@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import queryString from "query-string";
 import logo from "./logo.svg";
 import "./App.css";
@@ -173,6 +173,9 @@ function RelatedArtists(props) {
   const [title,setTitle]=useState()
   const [artist,setArtist]=useState(null)
   const [relatedArtists,setRelatedArtists]=useState()
+  const [relatedArtistTracks,setRelatedArtistTracks]=useState()
+  const [relatedSongURIs,setRelatedSongURIs]=useState()
+
 
   const handleSubmit = (e)=>{
     e.preventDefault()
@@ -213,27 +216,188 @@ function RelatedArtists(props) {
       )
   },[artist]
   )
-  //allArtists.forEach(item=>console.log(item.name.toLowerCase()))
-  //let searchedArtist=allArtists.forEach(artist=>artist.name.toLowerCase()===title.toLowerCase)
 
-  //console.log(searchedArtist("gorillaz"))
+  useEffect(()=>{
+    let parsed = queryString.parse(window.location.search)
+    let accessToken = parsed.access_token
+
+    if(typeof relatedArtists !== 'undefined')
+
+    Promise.all([
+      fetch("https://api.spotify.com/v1/artists/"+relatedArtists[0].id+"/top-tracks?country=HU", {
+        headers: {
+          Authorization: "Bearer " + accessToken,
+        }
+      }),
+      fetch("https://api.spotify.com/v1/artists/"+relatedArtists[1].id+"/top-tracks?country=HU", {
+        headers: {
+          Authorization: "Bearer " + accessToken,
+        }
+      }),
+      fetch("https://api.spotify.com/v1/artists/"+relatedArtists[2].id+"/top-tracks?country=HU", {
+        headers: {
+          Authorization: "Bearer " + accessToken,
+        }
+      }),
+      fetch("https://api.spotify.com/v1/artists/"+relatedArtists[3].id+"/top-tracks?country=HU", {
+        headers: {
+          Authorization: "Bearer " + accessToken,
+        }
+      }),
+      fetch("https://api.spotify.com/v1/artists/"+relatedArtists[4].id+"/top-tracks?country=HU", {
+        headers: {
+          Authorization: "Bearer " + accessToken,
+        }
+      })
+    ]).then(
+      ([
+        firstData,
+        secondData,
+        thirdData,
+        fourthData,
+        fifthData
+      ]) => {
+        return Promise.all([
+          firstData.json(),
+          secondData.json(),
+          thirdData.json(),
+          fourthData.json(),
+          fifthData.json()
+        ]);
+      }
+    ).then(
+      ([
+        firstData,
+        secondData,
+        thirdData,
+        fourthData,
+        fifthData
+      ]) =>
+      setRelatedArtistTracks(
+        {firstArtistsTracks:firstData.tracks.map((item) => {
+          return {
+            name: item.name,
+            artist: item.artists[0].name,
+            album: item.album.name,
+            id: item.id,
+            uri:item.uri
+          }
+        }),
+        secondArtistsTracks:secondData.tracks.map((item) => {
+          return {
+            name: item.name,
+            artist: item.artists[0].name,
+            album: item.album.name,
+            id: item.id,
+            uri:item.uri
+          }
+        }),
+        thirdArtistsTracks:thirdData.tracks.map((item) => {
+          return {
+            name: item.name,
+            artist: item.artists[0].name,
+            album: item.album.name,
+            id: item.id,
+            uri:item.uri
+          }
+        }),
+        fourthArtistsTracks:fourthData.tracks.map((item) => {
+          return {
+            name: item.name,
+            artist: item.artists[0].name,
+            album: item.album.name,
+            id: item.id,
+            uri:item.uri
+          }
+        }),
+        fifthArtistsTracks:fifthData.tracks.map((item) => {
+          return {
+            name: item.name,
+            artist: item.artists[0].name,
+            album: item.album.name,
+            id: item.id,
+            uri:item.uri
+          }
+        })}
+      )
+    )
+
+
+  },[relatedArtists] )
+
+  function handleCreateSubmit(e){
+    e.preventDefault()
+    console.log(relatedArtistTracks)
+    let allURIs= ((relatedArtistTracks.firstArtistsTracks.slice(0,5).map((track)=>{
+       return(track.uri)
+      })).join().concat((relatedArtistTracks.secondArtistsTracks.slice(0,5).map((track)=>{
+        return(track.uri)
+      })).join()).concat((relatedArtistTracks.thirdArtistsTracks.slice(0,5).map((track)=>{
+        return(track.uri)
+      })).join()).concat((relatedArtistTracks.fourthArtistsTracks.slice(0,5).map((track)=>{
+        return(track.uri)
+      })).join()).concat((relatedArtistTracks.fifthArtistsTracks.slice(0,5).map((track)=>{
+        return(track.uri)
+      })).join()))
+      console.log(allURIs)
+
+  }
+
+//   useState(()=>{
+//
+//     let parsed = queryString.parse(window.location.search);
+//     let accessToken = parsed.access_token;
+//
+//     if(typeof relatedArtists !== 'undefined')
+// {
+//     fetch("https://api.spotify.com/v1/users/"+props.userID+"/playlists", {
+//       method: "post",
+//       headers: {
+//         Authorization: "Bearer " + accessToken,
+//       },
+//       body:JSON.stringify({
+//         name: 'hello',
+//         description:'songs',
+//         public:'true'
+//       })
+//     }).then(playlistData=>(playlistData.json())).then(
+//       (playlistData)=>{
+//         console.log(playlistData)
+//       }
+//     )}
+//     console.log("sik")
+//
+//
+//
+//   },[])
+
+
+
+
 
   return(
     <div style={{backgroundColor:'', margin:'auto', marginBottom:'60px'}}>
       <h2 style={{textAlign:'center'}}>Enter names of one of your favourite artists to get related artists to them</h2>
       <form onSubmit={handleSubmit} style={{height:'40px', width:'50%', marginLeft:'27%', marginBottom:'20px'}}>
-        <input type="text" value={title} required onChange={(e)=> setTitle(e.target.value)} style={{fontSize:'40px'}}/>
+        <input type="text" value={title || ''} required onChange={(e)=> setTitle(e.target.value)} style={{fontSize:'40px'}}/>
         <input type="submit" value="Go!" style={{fontSize:'40px'}}/>
       </form>
       {relatedArtists ?
       (
         <div>
-        <FavArtist artist={relatedArtists[0]}/>
-        <FavArtist artist={relatedArtists[1]}/>
-        <FavArtist artist={relatedArtists[2]}/>
-        <FavArtist artist={relatedArtists[3]}/>
-        <FavArtist artist={relatedArtists[4]}/>
+        <div>
+          <FavArtist artist={relatedArtists[0]}/>
+          <FavArtist artist={relatedArtists[1]}/>
+          <FavArtist artist={relatedArtists[2]}/>
+          <FavArtist artist={relatedArtists[3]}/>
+          <FavArtist artist={relatedArtists[4]}/>
         </div>
+        <div>
+          <form onSubmit={handleCreateSubmit}>
+            <input type="submit" value="Create"/>
+          </form>
+        </div>
+      </div>
       )
       : <p></p>}
     </div>
@@ -251,6 +415,7 @@ function AudioFeatureTrend(props){
   let avgLiveness
   let avgLoudness
   let avgTempo
+  let avgSpeechiness
   let avgValence
 
   let readyToShow=false
@@ -258,9 +423,6 @@ function AudioFeatureTrend(props){
   let allSongIds=(props.tracks.map((track,index)=>{
     return(track.id)
   })).join()
-
-  console.log(allSongIds)
-
 
 
   const [audioFeatures,setAudioFeatures]=useState()
@@ -285,6 +447,7 @@ function AudioFeatureTrend(props){
               key:item.key,
               liveness:item.liveness,
               loudness:item.loudness,
+              speechiness:item.speechiness,
               tempo:item.tempo,
               valence:item.valence
             }
@@ -342,6 +505,10 @@ function AudioFeatureTrend(props){
       return valence.concat(eachTrack.valence)
     }, [])
 
+    let allSpeechiness = audioFeatures.reduce((speechiness, eachTrack) => {
+      return speechiness.concat(eachTrack.speechiness)
+    }, [])
+
     avgAcousticness=avg(allAcousticness)
     avgDanceability=avg(allDanceability)
     avgDuration=avg(allDuration)
@@ -352,6 +519,7 @@ function AudioFeatureTrend(props){
     avgLoudness=avg(allLoudness)
     avgTempo=avg(allTempo)
     avgValence=avg(allValence)
+    avgSpeechiness=avg(allSpeechiness)
 
   }
 
@@ -392,6 +560,16 @@ function AudioFeatureTrend(props){
     }
   }
 
+  function speechinessDecision(speechiness){
+    let basicResponse="The average speechiness for your top tracks suggests that you listen to tracks "
+    if(speechiness<=0.33){
+      return (basicResponse+"with almost no speech at all.")
+    }if(speechiness<=0.66){
+      return basicResponse+"that may contain both music and speech, either in sections or layered, including such cases as rap music."
+    }
+    return basicResponse+(" that are probably made entirely of spoken words.")
+  }
+
 
   return(
 
@@ -405,9 +583,10 @@ function AudioFeatureTrend(props){
           The higher the value, the easier it is to dance to the song.</p>
         <p>Average duration for your favourite songs is {toHumanTime(avgDuration)}</p>
         <p>{energyDecision(avgEnergy)} Your average energy score is {(Math.floor(avgEnergy*1000))/1000} highest possible point being 1.0.</p>
+        <p>{speechinessDecision(avgSpeechiness)} Your average speechiness score is {(Math.floor(avgSpeechiness*1000))/1000}</p>
         <p>Average BPM for you favourite songs is {Math.floor(avgTempo)}</p>
-        <p>Your average valence score is {(Math.floor(avgValence*1000))/1000}. Tracks with high valence sound more positive (happy, cheerful, euphoric), wh
-          ile tracks with low valence sound more negative (sad, depressed, angry).</p>
+        <p>Your average valence score is {(Math.floor(avgValence*1000))/1000}. Tracks with high valence sound more positive (happy, cheerful, euphoric), while
+          tracks with low valence sound more negative (sad, depressed, angry).</p>
 
     </div>)
     : (<div>
@@ -539,7 +718,10 @@ function RecentlyPlayed(props){
             name:item.track.name,
             albumName:item.track.album.name,
             duration:item.track.duration_ms,
-            image:item.track.album.images[0].url,
+            image:(item.track.album.images[0]
+              ? item.track.album.images[0].url
+              //below is an image that says no image available
+              : 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/1024px-No_image_available.svg.png' ),
             artist:item.track.artists[0].name
           }
         }))
@@ -549,7 +731,9 @@ function RecentlyPlayed(props){
   function toHumanTime(duration){
     let mins=Math.floor((duration/1000)/60)
     let seconds=Math.floor((duration/1000)%60)
-
+    // if(seconds<10){
+    //   return (mins+":0"+seconds)
+    // }
     return (mins+":"+seconds)
   }
 
@@ -558,8 +742,8 @@ function RecentlyPlayed(props){
   }
 
   function wordCutter(string){
-    return (string.length>18
-				? string.substr(0, 16).concat("...")
+    return (string.length>16
+				? string.substr(0, 13).concat("...")
 				: string)
   }
   let liStyle={
@@ -616,13 +800,15 @@ function App() {
   const [serverData, setServerData] = useState()
   const [searchText, setSearchText] = useState()
 
+//made this async not so sure about the effects
   useEffect(() => {
 
 
     let parsed = queryString.parse(window.location.search);
     let accessToken = parsed.access_token;
 
-    Promise.all([
+//await is here
+  Promise.all([
       //we are first fetching the user data(to extract the name)
       fetch("https://api.spotify.com/v1/me", {
         headers: {
@@ -844,7 +1030,7 @@ function App() {
             MTartists={serverData.user.favArtists.mediumTerm}
             STartists={serverData.user.favArtists.shortTerm}
           />
-            <RelatedArtists artists={serverData.user.favArtists}/>
+            <RelatedArtists artists={serverData.user.favArtists} userID={serverData.user.id}/>
             <AudioFeatureTrend tracks={serverData.user.favTracks.longTerm}/>
             <PlaylistCreator userID={serverData.user.id} tracks={serverData.user.favTracks}/>
             <RecentlyPlayed/>
