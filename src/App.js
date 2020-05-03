@@ -398,8 +398,9 @@ function RelatedArtists(props) {
           <FavArtist artist={relatedArtists[4]}/>
         </div>
         <div>
-          <form onSubmit={handleCreateSubmit}>
-            <input type="submit" value="Create"/>
+          <p style={{fontSize:'20px',textAlign:'center'}}>{"If you wish you can create a playlist with these artists' top tracks. Press Create if you want to proceed"}</p>
+          <form onSubmit={handleCreateSubmit} style={{marginLeft:'45%'}}>
+            <input type="submit" value="Create" style={{fontSize:'30px'}}/>
           </form>
         </div>
       </div>
