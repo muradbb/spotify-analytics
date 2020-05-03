@@ -327,50 +327,55 @@ function RelatedArtists(props) {
 
   function handleCreateSubmit(e){
     e.preventDefault()
-    console.log(relatedArtistTracks)
-    let allURIs= ((relatedArtistTracks.firstArtistsTracks.slice(0,5).map((track)=>{
+    //console.log(relatedArtistTracks)
+    let allURIs= (relatedArtistTracks.firstArtistsTracks.slice(0,5).map((track)=>{
        return(track.uri)
-      })).join().concat((relatedArtistTracks.secondArtistsTracks.slice(0,5).map((track)=>{
+     })).join().concat(','+(relatedArtistTracks.secondArtistsTracks.slice(0,5).map((track)=>{
         return(track.uri)
-      })).join()).concat((relatedArtistTracks.thirdArtistsTracks.slice(0,5).map((track)=>{
+      })).join()).concat(','+(relatedArtistTracks.thirdArtistsTracks.slice(0,5).map((track)=>{
         return(track.uri)
-      })).join()).concat((relatedArtistTracks.fourthArtistsTracks.slice(0,5).map((track)=>{
+      })).join()).concat(','+(relatedArtistTracks.fourthArtistsTracks.slice(0,5).map((track)=>{
         return(track.uri)
-      })).join()).concat((relatedArtistTracks.fifthArtistsTracks.slice(0,5).map((track)=>{
+      })).join()).concat(','+(relatedArtistTracks.fifthArtistsTracks.slice(0,5).map((track)=>{
         return(track.uri)
-      })).join()))
-      console.log(allURIs)
+      })).join())
+      setRelatedSongURIs(allURIs)
 
   }
 
-//   useState(()=>{
-//
-//     let parsed = queryString.parse(window.location.search);
-//     let accessToken = parsed.access_token;
-//
-//     if(typeof relatedArtists !== 'undefined')
-// {
-//     fetch("https://api.spotify.com/v1/users/"+props.userID+"/playlists", {
-//       method: "post",
-//       headers: {
-//         Authorization: "Bearer " + accessToken,
-//       },
-//       body:JSON.stringify({
-//         name: 'hello',
-//         description:'songs',
-//         public:'true'
-//       })
-//     }).then(playlistData=>(playlistData.json())).then(
-//       (playlistData)=>{
-//         console.log(playlistData)
-//       }
-//     )}
-//     console.log("sik")
-//
-//
-//
-//   },[])
+  useEffect(()=>{
 
+    let parsed = queryString.parse(window.location.search)
+    let accessToken = parsed.access_token
+
+    if(typeof relatedSongURIs !=='undefined'){
+
+      fetch("https://api.spotify.com/v1/users/"+props.userID+"/playlists", {
+        method: "post",
+        headers: {
+          Authorization: "Bearer " + accessToken,
+        },
+        body:JSON.stringify({
+          name: 'Tracks like '+artist.name+"'s",
+          description:'songs',
+          public:'true'
+        })
+      }).then(response=>(response.json())).then(
+        (response)=>{
+          fetch("https://api.spotify.com/v1/playlists/"+response.id+"/tracks?uris="+relatedSongURIs, {
+            method:'post',
+            headers: {
+              Authorization: "Bearer " + accessToken,
+            }
+          }).then(responseData=>(responseData.json())).then(
+            responseData=>{console.log("works")}
+          )
+        }
+      )
+
+
+    }
+  },[relatedSongURIs])
 
 
 
