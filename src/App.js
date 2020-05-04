@@ -25,8 +25,8 @@ function Introduction(props) {
   return (
     <div style={{color:'#FFA07A'}}>
       <h1 style={{textAlign:'center'}}>
-        Hello, {props.user.name}.You have {props.user.playlists.length} playlists which is a total of {totalSongs} songs.{" "}
-      </h1>{" "}
+        Hello, {props.user.name}.You have {props.user.playlists.length} playlists which is a total of {totalSongs} songs.
+      </h1>
     </div>
   );
 }
@@ -50,21 +50,21 @@ function FavArtist(props) {
               width: "220px",
               height: "220px",
             }}
-          />{" "}
-        </div>{" "}
+          />
+        </div>
         <div className="flip-card-back">
-          <h2 style={{color:'white'}}> {props.artist.name} </h2>{" "}
-          <p> Followers: {props.artist.followers} </p>{" "}
+          <h2 style={{color:'white'}}> {props.artist.name} </h2>
+          <p> Followers: {props.artist.followers} </p>
           <p>
-            {" "}
+
             Genres:
             {props.artist.genres.length > 0
               ? (genreString)
               : " No genres available for this artist"}
-          </p>{" "}
-          <p> Popularity: {props.artist.popularity} </p>{" "}
-        </div>{" "}
-      </div>{" "}
+          </p>
+          <p> Popularity: {props.artist.popularity} </p>
+        </div>
+      </div>
     </div>
   </div>
   );
@@ -74,11 +74,11 @@ function FavTracks(props) {
   return (
     <div className="songBlock">
       <ol>
-        {" "}
+
         {props.tracks.map((track) => (
           <li> {" " + track.name + " - " + track.artist} </li>
-        ))}{" "}
-      </ol>{" "}
+        ))}
+      </ol>
     </div>
   );
 }
@@ -128,7 +128,7 @@ function UserTrends(props) {
   );
   return (
     <div className="PieChartt">
-      <h2 style={{textAlign:'center'}}> Your Genre Pie Chart </h2>{" "}
+      <h2 style={{textAlign:'center'}}> Your Genre Pie Chart </h2>
       <Chart
         width={"800px"}
         height={"600px"}
@@ -155,7 +155,7 @@ function UserTrends(props) {
         rootProps={{
           "data-testid": "1",
         }}
-      />{" "}
+      />
     </div>
   );
 }
@@ -324,6 +324,7 @@ function RelatedArtists(props) {
 
 
   },[relatedArtists] )
+
 
   function handleCreateSubmit(e){
     e.preventDefault()
@@ -802,18 +803,90 @@ function RecentlyPlayed(props){
   )
 }
 
+function TopArtitPlaylistCreator(props){
+
+  const [artistLimit,setArtistLimit]=useState()
+  const [trackLimit,setTrackLimit]=useState()
+  const [artists,setArtists]=useState()
+  const [tracks,setTracks]=useState([])
+  const [newTracks,setNewTracks]=useState()
+
+  let trackList=[]
+
+
+
+
+  let allArtists=props.artists
+
+
+
+
+
+
+  function handleSubmit(e){
+    e.preventDefault()
+    console.log("artist limit: "+artistLimit)
+    console.log("track limit: "+trackLimit)
+    //console.log(allArtists.slice(0,artistLimit))
+    setArtists(allArtists.slice(0,artistLimit))
+  }
+
+  useEffect(()=>{
+    let parsed = queryString.parse(window.location.search);
+    let accessToken = parsed.access_token;
+
+
+    if(typeof artists!=='undefined')
+    //artists.forEach(artist=>console.log(artist))
+
+    artists.forEach(artist=>{
+      fetch("https://api.spotify.com/v1/artists/"+artist.id+"/top-tracks?country=HU", {
+        headers: {
+          Authorization: "Bearer " + accessToken,
+        }
+      }).then(responseData=>(responseData.json())).then(
+        responseData=>{
+          trackList.push(responseData.tracks)
+          //console.log(trackList.length)
+
+        })
+    })
+    setTracks(trackList)
+  },[artists])
+  if(tracks.length==4){
+    console.log(tracks)
+
+  }
+
+
+
+
+  return(
+    <div style={{border:'3px solid #fe9b1d',margin:'2%'}}>
+      <h3>By pressing create you can make a playlist with your choosing of top artists and their top tracks</h3>
+      <form onSubmit={handleSubmit}>
+        <input type="text" value={artistLimit} placeholder='artist limit' required onChange={(e)=> setArtistLimit(e.target.value)}/>
+        <input type="text" value={trackLimit} placeholder='track limit' required onChange={(e)=> setTrackLimit((e.target.value)>10 ? 10 : (e.target.value) )}/>
+        <input type="submit" value="Create"/>
+      </form>
+    </div>
+  )
+}
+
+
+
+
+
 function App() {
   const [serverData, setServerData] = useState()
   const [searchText, setSearchText] = useState()
 
-//made this async not so sure about the effects
   useEffect(() => {
 
 
     let parsed = queryString.parse(window.location.search);
     let accessToken = parsed.access_token;
 
-//await is here
   Promise.all([
       //we are first fetching the user data(to extract the name)
       fetch("https://api.spotify.com/v1/me", {
@@ -995,42 +1068,47 @@ function App() {
 
   return (
     <div>
-      {" "}
+
       {serverData ? (
         <div>
           <header>
-            <Introduction user={serverData.user} />{" "}
-          </header>{" "}
+            <Introduction user={serverData.user} />
+          </header>
           <div className="FavArtists">
-            <h2 style={{textAlign:'center'}}> Your all time favourite artists </h2>{" "}
+            <h2 style={{textAlign:'center'}}> Your all time favourite artists </h2>
             {serverData.user.favArtists.longTerm.slice(0, 5).map((artist) => (
               <FavArtist artist={artist} />
-            ))}{" "}
-            <h2> Your favourite artists for the last 6 months </h2>{" "}
+            ))}
+            <TopArtitPlaylistCreator artists={serverData.user.favArtists.longTerm}/>
+
+            <h2> Your favourite artists for the last 6 months </h2>
             {serverData.user.favArtists.mediumTerm.slice(0, 5).map((artist) => (
               <FavArtist artist={artist} />
-            ))}{" "}
-            <h2> Your favourite artists for the last 4 weeks </h2>{" "}
+            ))}
+            <TopArtitPlaylistCreator artists={serverData.user.favArtists.mediumTerm}/>
+
+            <h2> Your favourite artists for the last 4 weeks </h2>
             {serverData.user.favArtists.shortTerm.slice(0, 5).map((artist) => (
               <FavArtist artist={artist} />
-            ))}{" "}
-          </div>{" "}
+            ))}
+            <TopArtitPlaylistCreator artists={serverData.user.favArtists.shortTerm}/>
+
+          </div>
           <div className="FavTracks">
             <h2>
-              {" "}
               These are a list of songs that were your favourite over a certian
-              period of time{" "}
-            </h2>{" "}
+              period of time
+            </h2>
             <Collapsible trigger="Your all time favourite tracks">
-              <FavTracks tracks={serverData.user.favTracks.longTerm} />{" "}
-            </Collapsible>{" "}
+              <FavTracks tracks={serverData.user.favTracks.longTerm} />
+            </Collapsible>
             <Collapsible trigger="Your favourite tracks for the last 6 months">
-              <FavTracks tracks={serverData.user.favTracks.mediumTerm} />{" "}
-            </Collapsible>{" "}
+              <FavTracks tracks={serverData.user.favTracks.mediumTerm} />
+            </Collapsible>
             <Collapsible trigger="Your favourite tracks for the last 4 weeks">
-              <FavTracks tracks={serverData.user.favTracks.shortTerm} />{" "}
-            </Collapsible>{" "}
-          </div>{" "}
+              <FavTracks tracks={serverData.user.favTracks.shortTerm} />
+            </Collapsible>
+          </div>
           <UserTrends
             LTartists={serverData.user.favArtists.longTerm}
             MTartists={serverData.user.favArtists.mediumTerm}
@@ -1055,8 +1133,8 @@ function App() {
             marginLeft:'33%'
           }}
         >
-          {" "}
-          Sign in with Spotify{" "}
+
+          Sign in with Spotify
         </button>
       )}
     </div>
