@@ -803,7 +803,7 @@ function RecentlyPlayed(props){
   )
 }
 
-function TopArtitPlaylistCreator(props){
+function TopArtistPlaylistCreator(props){
 
   const [artistLimit,setArtistLimit]=useState(0)
   const [trackLimit,setTrackLimit]=useState(0)
@@ -811,7 +811,7 @@ function TopArtitPlaylistCreator(props){
   const [tracks,setTracks]=useState()
   const [URIstring,setURIstring]=useState()
 
-  let allArtists=props.artists
+  let allArtists=props.artists.slice(0,40)
 
   function handleSubmit(e){
     e.preventDefault()
@@ -856,9 +856,9 @@ function TopArtitPlaylistCreator(props){
        if(typeof tracks!=='undefined'){
          let allURIs= (tracks.flat().map((track)=>{
             return(track.uri)
-          })).join()
-         console.log('here')
-        fetch("https://api.spotify.com/v1/users/"+props.userID+"/playlists", {
+          }))
+        if(allURIs.length<=100){
+          fetch("https://api.spotify.com/v1/users/"+props.userID+"/playlists", {
           method: "post",
           headers: {
             Authorization: "Bearer " + accessToken,
@@ -870,16 +870,153 @@ function TopArtitPlaylistCreator(props){
           })
         }).then(playlistData=>(playlistData.json())).then(
           (playlistData)=>{
-            fetch("https://api.spotify.com/v1/playlists/"+playlistData.id+"/tracks?uris="+allURIs, {
+            fetch("https://api.spotify.com/v1/playlists/"+playlistData.id+"/tracks", {
               method:'post',
               headers: {
                 Authorization: "Bearer " + accessToken,
-              }
-            }).then(responseData=>(responseData.json())).then(
-              responseData=>{console.log("boom")}
-            )
+              },
+              body:JSON.stringify({
+                uris: allURIs.slice(0,100)
+              })
+            })
+
           }
         )
+      }else if (allURIs.length<=200) {
+        fetch("https://api.spotify.com/v1/users/"+props.userID+"/playlists", {
+        method: "post",
+        headers: {
+          Authorization: "Bearer " + accessToken,
+        },
+        body:JSON.stringify({
+          name: 'Your favourtie artists tracks',
+          description:'songs',
+          public:'true'
+        })
+      }).then(playlistData=>(playlistData.json())).then(
+        (playlistData)=>{
+          fetch("https://api.spotify.com/v1/playlists/"+playlistData.id+"/tracks", {
+            method:'post',
+            headers: {
+              Authorization: "Bearer " + accessToken,
+            },
+            body:JSON.stringify({
+              uris: allURIs.slice(0,100)
+            })
+          }).then(
+            fetch("https://api.spotify.com/v1/playlists/"+playlistData.id+"/tracks", {
+              method:'post',
+              headers: {
+                Authorization: "Bearer " + accessToken,
+              },
+              body:JSON.stringify({
+                uris: allURIs.slice(100,200)
+              })
+            })
+          )
+        }
+      )
+      //end of if
+    }else if (allURIs.length<=300) {
+      fetch("https://api.spotify.com/v1/users/"+props.userID+"/playlists", {
+      method: "post",
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+      body:JSON.stringify({
+        name: 'Your favourtie artists tracks',
+        description:'songs',
+        public:'true'
+      })
+    }).then(playlistData=>(playlistData.json())).then(
+      (playlistData)=>{
+        fetch("https://api.spotify.com/v1/playlists/"+playlistData.id+"/tracks", {
+          method:'post',
+          headers: {
+            Authorization: "Bearer " + accessToken,
+          },
+          body:JSON.stringify({
+            uris: allURIs.slice(0,100)
+          })
+        }).then(
+          fetch("https://api.spotify.com/v1/playlists/"+playlistData.id+"/tracks", {
+            method:'post',
+            headers: {
+              Authorization: "Bearer " + accessToken,
+            },
+            body:JSON.stringify({
+              uris: allURIs.slice(100,200)
+            })
+          })
+        ).then(
+          fetch("https://api.spotify.com/v1/playlists/"+playlistData.id+"/tracks", {
+            method:'post',
+            headers: {
+              Authorization: "Bearer " + accessToken,
+            },
+            body:JSON.stringify({
+              uris: allURIs.slice(200,300)
+            })
+          })
+        )
+      }
+    )
+  }else if (allURIs.length<=400) {
+    fetch("https://api.spotify.com/v1/users/"+props.userID+"/playlists", {
+    method: "post",
+    headers: {
+      Authorization: "Bearer " + accessToken,
+    },
+    body:JSON.stringify({
+      name: 'Your favourtie artists tracks',
+      description:'songs',
+      public:'true'
+    })
+  }).then(playlistData=>(playlistData.json())).then(
+    (playlistData)=>{
+      fetch("https://api.spotify.com/v1/playlists/"+playlistData.id+"/tracks", {
+        method:'post',
+        headers: {
+          Authorization: "Bearer " + accessToken,
+        },
+        body:JSON.stringify({
+          uris: allURIs.slice(0,100)
+        })
+      }).then(
+        fetch("https://api.spotify.com/v1/playlists/"+playlistData.id+"/tracks", {
+          method:'post',
+          headers: {
+            Authorization: "Bearer " + accessToken,
+          },
+          body:JSON.stringify({
+            uris: allURIs.slice(100,200)
+          })
+        })
+      ).then(
+        fetch("https://api.spotify.com/v1/playlists/"+playlistData.id+"/tracks", {
+          method:'post',
+          headers: {
+            Authorization: "Bearer " + accessToken,
+          },
+          body:JSON.stringify({
+            uris: allURIs.slice(200,300)
+          })
+        })
+      ).then(
+        fetch("https://api.spotify.com/v1/playlists/"+playlistData.id+"/tracks", {
+          method:'post',
+          headers: {
+            Authorization: "Bearer " + accessToken,
+          },
+          body:JSON.stringify({
+            uris: allURIs.slice(300,400)
+          })
+        })
+      )
+    }
+  )
+
+}
       }
 
 
@@ -1105,19 +1242,19 @@ function App() {
             {serverData.user.favArtists.longTerm.slice(0, 5).map((artist) => (
               <FavArtist artist={artist} />
             ))}
-            <TopArtitPlaylistCreator artists={serverData.user.favArtists.longTerm} userID={serverData.user.id}/>
+            <TopArtistPlaylistCreator artists={serverData.user.favArtists.longTerm} userID={serverData.user.id}/>
 
             <h2> Your favourite artists for the last 6 months </h2>
             {serverData.user.favArtists.mediumTerm.slice(0, 5).map((artist) => (
               <FavArtist artist={artist} />
             ))}
-            <TopArtitPlaylistCreator artists={serverData.user.favArtists.mediumTerm} userID={serverData.user.id}/>
+            <TopArtistPlaylistCreator artists={serverData.user.favArtists.mediumTerm} userID={serverData.user.id}/>
 
             <h2> Your favourite artists for the last 4 weeks </h2>
             {serverData.user.favArtists.shortTerm.slice(0, 5).map((artist) => (
               <FavArtist artist={artist} />
             ))}
-            <TopArtitPlaylistCreator artists={serverData.user.favArtists.shortTerm} userID={serverData.user.id}/>
+            <TopArtistPlaylistCreator artists={serverData.user.favArtists.shortTerm} userID={serverData.user.id}/>
 
           </div>
           <div className="FavTracks">
