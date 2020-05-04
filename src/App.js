@@ -805,60 +805,86 @@ function RecentlyPlayed(props){
 
 function TopArtitPlaylistCreator(props){
 
-  const [artistLimit,setArtistLimit]=useState()
-  const [trackLimit,setTrackLimit]=useState()
+  const [artistLimit,setArtistLimit]=useState(0)
+  const [trackLimit,setTrackLimit]=useState(0)
   const [artists,setArtists]=useState()
-  const [tracks,setTracks]=useState([])
-  const [newTracks,setNewTracks]=useState()
-
-  let trackList=[]
-
-
-
+  const [tracks,setTracks]=useState()
+  const [URIstring,setURIstring]=useState()
 
   let allArtists=props.artists
 
-
-
-
-
-
   function handleSubmit(e){
     e.preventDefault()
-    console.log("artist limit: "+artistLimit)
-    console.log("track limit: "+trackLimit)
+    // console.log("artist limit: "+artistLimit)
+    // console.log("track limit: "+trackLimit)
     //console.log(allArtists.slice(0,artistLimit))
     setArtists(allArtists.slice(0,artistLimit))
   }
 
   useEffect(()=>{
-    let parsed = queryString.parse(window.location.search);
-    let accessToken = parsed.access_token;
 
+    async function trackSetter(artists){
+      let parsed = queryString.parse(window.location.search);
+      let accessToken = parsed.access_token;
+      let artistTrackList=[]
 
-    if(typeof artists!=='undefined')
-    //artists.forEach(artist=>console.log(artist))
-
-    artists.forEach(artist=>{
-      fetch("https://api.spotify.com/v1/artists/"+artist.id+"/top-tracks?country=HU", {
-        headers: {
-          Authorization: "Bearer " + accessToken,
-        }
-      }).then(responseData=>(responseData.json())).then(
-        responseData=>{
-          trackList.push(responseData.tracks)
-          //console.log(trackList.length)
-
+      for (const artist of artists){
+      const response=await  fetch("https://api.spotify.com/v1/artists/"+artist.id+"/top-tracks?country=HU", {
+          headers: {
+            Authorization: "Bearer " + accessToken,
+          }
         })
-    })
-    setTracks(trackList)
+      const responseData = await response.json()
+      artistTrackList.push(responseData.tracks.slice(0,trackLimit))
+
+      }
+      setTracks(artistTrackList)
+
+    }
+
+    if(typeof artists!=='undefined'){
+      trackSetter(artists)
+
+   }
   },[artists])
-  if(tracks.length==4){
-    console.log(tracks)
-
-  }
 
 
+     useEffect(()=>{
+       let parsed = queryString.parse(window.location.search);
+       let accessToken = parsed.access_token;
+
+       if(typeof tracks!=='undefined'){
+         let allURIs= (tracks.flat().map((track)=>{
+            return(track.uri)
+          })).join()
+         console.log('here')
+        fetch("https://api.spotify.com/v1/users/"+props.userID+"/playlists", {
+          method: "post",
+          headers: {
+            Authorization: "Bearer " + accessToken,
+          },
+          body:JSON.stringify({
+            name: 'Your favourtie artists tracks',
+            description:'songs',
+            public:'true'
+          })
+        }).then(playlistData=>(playlistData.json())).then(
+          (playlistData)=>{
+            fetch("https://api.spotify.com/v1/playlists/"+playlistData.id+"/tracks?uris="+allURIs, {
+              method:'post',
+              headers: {
+                Authorization: "Bearer " + accessToken,
+              }
+            }).then(responseData=>(responseData.json())).then(
+              responseData=>{console.log("boom")}
+            )
+          }
+        )
+      }
+
+
+
+     },[tracks])
 
 
   return(
@@ -1079,19 +1105,19 @@ function App() {
             {serverData.user.favArtists.longTerm.slice(0, 5).map((artist) => (
               <FavArtist artist={artist} />
             ))}
-            <TopArtitPlaylistCreator artists={serverData.user.favArtists.longTerm}/>
+            <TopArtitPlaylistCreator artists={serverData.user.favArtists.longTerm} userID={serverData.user.id}/>
 
             <h2> Your favourite artists for the last 6 months </h2>
             {serverData.user.favArtists.mediumTerm.slice(0, 5).map((artist) => (
               <FavArtist artist={artist} />
             ))}
-            <TopArtitPlaylistCreator artists={serverData.user.favArtists.mediumTerm}/>
+            <TopArtitPlaylistCreator artists={serverData.user.favArtists.mediumTerm} userID={serverData.user.id}/>
 
             <h2> Your favourite artists for the last 4 weeks </h2>
             {serverData.user.favArtists.shortTerm.slice(0, 5).map((artist) => (
               <FavArtist artist={artist} />
             ))}
-            <TopArtitPlaylistCreator artists={serverData.user.favArtists.shortTerm}/>
+            <TopArtitPlaylistCreator artists={serverData.user.favArtists.shortTerm} userID={serverData.user.id}/>
 
           </div>
           <div className="FavTracks">
