@@ -47,21 +47,17 @@ function Introduction(props)
                 textAlign: "center"
             }
         } >
-        Hello,
-        {
+        Hello, {
             props.user.name
-        }.You have
-        {
+        }. You have {
             props.user.playlists.length
         }
         {
             " "
         }
-        playlists which is a total of
-        {
+        playlists which is a total of {
             totalSongs
-        }
-        songs. <
+        } songs. <
         /h1> <
         /div>
     );
@@ -114,8 +110,7 @@ function FavArtist(props)
         {
             props.artist.name
         } < /h2> <
-        p > Followers:
-        {
+        p > Followers: {
             props.artist.followers
         } < /p> <
         p >
@@ -126,8 +121,7 @@ function FavArtist(props)
                 " No genres available for this artist"
         } <
         /p> <
-        p > Popularity:
-        {
+        p > Popularity: {
             props.artist.popularity
         } < /p> <
         /div> <
