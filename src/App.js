@@ -950,11 +950,12 @@ function RecentlyPlayed(props) {
 }
 
 function TopArtistPlaylistCreator(props) {
-  const [artistLimit, setArtistLimit] = useState(0);
-  const [trackLimit, setTrackLimit] = useState(0);
-  const [artists, setArtists] = useState();
-  const [tracks, setTracks] = useState();
-  const [URIstring, setURIstring] = useState();
+  const [artistLimit, setArtistLimit] = useState(0)
+  const [trackLimit, setTrackLimit] = useState(0)
+  const [artists, setArtists] = useState()
+  const [tracks, setTracks] = useState()
+  const [URIstring, setURIstring] = useState()
+  const [playlistName,setPlaylistName]=useState('')
 
   let allArtists = props.artists.slice(0, 40);
 
@@ -1011,7 +1012,7 @@ function TopArtistPlaylistCreator(props) {
               Authorization: "Bearer " + accessToken,
             },
             body: JSON.stringify({
-              name: "Your favourtie artists tracks",
+              name: playlistName,
               description: "songs",
               public: "true",
             }),
@@ -1043,7 +1044,7 @@ function TopArtistPlaylistCreator(props) {
               Authorization: "Bearer " + accessToken,
             },
             body: JSON.stringify({
-              name: "Your favourtie artists tracks",
+              name: playlistName,
               description: "songs",
               public: "true",
             }),
@@ -1090,7 +1091,7 @@ function TopArtistPlaylistCreator(props) {
               Authorization: "Bearer " + accessToken,
             },
             body: JSON.stringify({
-              name: "Your favourtie artists tracks",
+              name: playlistName,
               description: "songs",
               public: "true",
             }),
@@ -1154,7 +1155,7 @@ function TopArtistPlaylistCreator(props) {
               Authorization: "Bearer " + accessToken,
             },
             body: JSON.stringify({
-              name: "Your favourtie artists tracks",
+              name: playlistName,
               description: "songs",
               public: "true",
             }),
@@ -1269,6 +1270,8 @@ function TopArtistPlaylistCreator(props) {
               )
             }
           />
+        <p>Name the playlist</p>
+        <input type="text" value={playlistName} required onChange={(e) => setPlaylistName(e.target.value)}/>
           <input type="submit" value="Create" />
         </form>
       </div>
@@ -1507,7 +1510,7 @@ function App() {
               userID={serverData.user.id}
             />
           </div>
-          <div className="FavTracks">
+          <div style={{marginLeft:'1.5%'}}>
             <h2>
               These are a list of songs that were your favourite over a certian
               period of time
