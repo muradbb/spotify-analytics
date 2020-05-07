@@ -35,31 +35,22 @@ function Introduction(props)
         (accumulator, currentValue) => accumulator + currentValue
     );
 
-    return ( <
-        div style = {
+    return (
+       <div style = {
             {
                 color: "#FFA07A"
             }
         } >
-        <
-        h1 style = {
+        <h1 style = {
             {
                 textAlign: "center"
             }
         } >
-        Hello, {
-            props.user.name
-        }. You have {
-            props.user.playlists.length
-        }
-        {
-            " "
-        }
-        playlists which is a total of {
+        Hello, {props.user.name}. You have {props.user.playlists.length} playlists which is a total of {
             totalSongs
-        } songs. <
-        /h1> <
-        /div>
+        } songs.
+        </h1>
+      </div>
     );
 }
 
@@ -907,26 +898,21 @@ function UserTrends(props)
             {
                 typeof audioFeatures !== "undefined" ? ( <
                     div >
-                    <
-                    p >
+                    <p>
                     {
                         acousticnessDecision(avgAcousticness)
                     }
-                    Your average acousticness score is
-                    {
-                        Math.floor(avgAcousticness * 1000) / 1000
-                    }
-                    highest possible point being 1.0 <
-                    /p> <
-                    p >
+                    {" "}Your average acousticness score is {Math.floor(avgAcousticness * 1000) / 1000} highest possible point being 1.0
+                  </p>
+                   <p>
                     {
                         danceabilityDecision(avgDanceability)
                     }
-                    Your average danceability score is
+                    {" "}Your average danceability score is{" "}
                     {
                         Math.floor(avgDanceability * 1000) / 1000
                     }
-                    highest possible point being possible 1.0.The higher the value, the easier it is to dance to the song. <
+                    {" "}highest possible point being possible 1.0. The higher the value, the easier it is to dance to the song. <
                     /p> <
                     p >
                     Average duration
@@ -942,35 +928,35 @@ function UserTrends(props)
                     {
                         energyDecision(avgEnergy)
                     }
-                    Your average energy score is
+                    {" "}Your average energy score is
                     {
                         " "
                     }
                     {
                         Math.floor(avgEnergy * 1000) / 1000
                     }
-                    highest possible point being 1.0. <
+                    {" "}highest possible point being 1.0. <
                     /p> <
                     p >
                     {
                         speechinessDecision(avgSpeechiness)
                     }
-                    Your average speechiness score is
+                    Your average speechiness score is{" "}
                     {
                         Math.floor(avgSpeechiness * 1000) / 1000
                     } <
                     /p> <
                     p > Average BPM
-                    for you favourite songs is
+                    for you favourite songs is{" "}
                     {
                         Math.floor(avgTempo)
                     } < /p> <
                     p >
-                    Your average valence score is
+                    Your average valence score is{" "}
                     {
                         Math.floor(avgValence * 1000) / 1000
                     }
-                    .Tracks with high valence sound more positive(happy, cheerful,
+                    . Tracks with high valence sound more positive(happy, cheerful,
                         euphoric),
                     while tracks with low valence sound more negative(sad,
                         depressed, angry). <
@@ -2143,8 +2129,8 @@ function UserTrends(props)
                     /div>
                 )
 
-            } <
-            /div>
+            }
+            </div>
         );
     }
 
