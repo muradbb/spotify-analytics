@@ -2103,7 +2103,7 @@ function UserTrends(props)
                         {
                             window.location = window.location.href.includes("localhost") ?
                                 "http://localhost:8888/login" :
-                                "http://spotify-analytics-backendd.herokuapp.com/login";
+                                "http://backend.eba-dpbn2gv2.us-east-2.elasticbeanstalk.com/login";
                         }
                     }
                     style = {
