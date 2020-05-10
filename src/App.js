@@ -1158,7 +1158,7 @@ function UserTrends(props)
                                 name: item.track.name,
                                 albumName: item.track.album.name,
                                 duration: item.track.duration_ms,
-                                image: item.track.album.images[0] 
+                                image: item.track.album.images[0]
                                   ? item.track.album.images[0].url
                                   : noImageAvailable,
                                 artist: item.track.artists[0].name,
@@ -2114,7 +2114,7 @@ function UserTrends(props)
                         {
                             window.location = window.location.href.includes("localhost") ?
                                 "http://localhost:8888/login" :
-                                "http://backend.eba-dpbn2gv2.us-east-2.elasticbeanstalk.com/";
+                                "http://backend.eba-dpbn2gv2.us-east-2.elasticbeanstalk.com/login";
                         }
                     }
                     style = {
