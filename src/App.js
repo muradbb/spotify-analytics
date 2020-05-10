@@ -1954,7 +1954,7 @@ function UserTrends(props)
         return ( <
             div >
             {
-                serverData ? ( <
+                (typeof serverData!='undefined') ? ( <
                     div >
                     <
                     header >
