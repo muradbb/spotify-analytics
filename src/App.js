@@ -23,6 +23,9 @@ const capitalize = (s) =>
     return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
+let noImageAvailable="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/1024px-No_image_available.svg.png"
+
+
 function Introduction(props)
 {
     //putting all song counts in a list
@@ -306,7 +309,9 @@ function UserTrends(props)
                         {
                             return {
                                 name: item.name,
-                                imageUrl: item.images[0].url,
+                                imageUrl: item.images[0]
+                                  ? item.images[0].url
+                                  : noImageAvailable,
                                 genres: item.genres,
                                 followers: item.followers.total,
                                 popularity: item.popularity,
@@ -1153,9 +1158,9 @@ function UserTrends(props)
                                 name: item.track.name,
                                 albumName: item.track.album.name,
                                 duration: item.track.duration_ms,
-                                image: item.track.album.images[0] ?
-                                    item.track.album.images[0].url : //below is an image that says no image available
-                                    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/1024px-No_image_available.svg.png",
+                                image: item.track.album.images[0] 
+                                  ? item.track.album.images[0].url
+                                  : noImageAvailable,
                                 artist: item.track.artists[0].name,
                             };
                         })
@@ -1881,7 +1886,9 @@ function UserTrends(props)
                                 {
                                     return {
                                         name: item.name,
-                                        imageUrl: item.images[0].url,
+                                        imageUrl: item.images[0]
+                                          ? item.images[0].url
+                                          : noImageAvailable,
                                         genres: item.genres,
                                         followers: item.followers.total,
                                         popularity: item.popularity,
@@ -1893,7 +1900,9 @@ function UserTrends(props)
                                 {
                                     return {
                                         name: item.name,
-                                        imageUrl: item.images[0].url,
+                                        imageUrl: item.images[0]
+                                          ? item.images[0].url
+                                          : noImageAvailable,
                                         genres: item.genres,
                                         followers: item.followers.total,
                                         popularity: item.popularity,
@@ -1905,7 +1914,9 @@ function UserTrends(props)
                                 {
                                     return {
                                         name: item.name,
-                                        imageUrl: item.images[0].url,
+                                        imageUrl: item.images[0]
+                                          ? item.images[0].url
+                                          : noImageAvailable,
                                         genres: item.genres,
                                         followers: item.followers.total,
                                         popularity: item.popularity,
@@ -1954,7 +1965,7 @@ function UserTrends(props)
         return ( <
             div >
             {
-                (typeof serverData!='undefined') ? ( <
+                serverData ? ( <
                     div >
                     <
                     header >
@@ -2103,7 +2114,7 @@ function UserTrends(props)
                         {
                             window.location = window.location.href.includes("localhost") ?
                                 "http://localhost:8888/login" :
-                                "http://backend.eba-dpbn2gv2.us-east-2.elasticbeanstalk.com/login";
+                                "http://backend.eba-dpbn2gv2.us-east-2.elasticbeanstalk.com/";
                         }
                     }
                     style = {
