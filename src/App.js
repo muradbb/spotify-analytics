@@ -32,11 +32,11 @@ function Introduction(props)
     let allSongs = props.user.playlists.reduce((songCount, eachPlaylist) =>
     {
         return songCount.concat(eachPlaylist.songCount);
-    }, []);
+    }, [])
     //and then adding them together
     let totalSongs = allSongs.reduce(
         (accumulator, currentValue) => accumulator + currentValue
-    );
+    )
 
     return (
        <div style = {
@@ -66,7 +66,7 @@ function FavArtist(props)
             " " +
             capitalize(genre) +
             (index < props.artist.genres.slice(0, 5).length - 1 ? "," : ".")
-        );
+        )
 
     return ( <
         div style = {
@@ -154,14 +154,7 @@ function UserTrends(props)
     {
         return genres.concat(artist.genres);
     }, []);
-    let allMTgenres = props.MTartists.reduce((genres, artist) =>
-    {
-        return genres.concat(artist.genres);
-    }, []);
-    let allSTgenres = props.STartists.reduce((genres, artist) =>
-    {
-        return genres.concat(artist.genres);
-    }, []);
+
 
     function ocurrenceSort(a, b)
     {
@@ -174,23 +167,9 @@ function UserTrends(props)
             value: getOcurrences(allLTgenres, item),
         };
     });
-    let MTgenrePercentages = [...new Set(allMTgenres)].map((item) =>
-    {
-        return {
-            title: item,
-            value: getOcurrences(allMTgenres, item),
-        };
-    });
-    let STgenrePercentages = [...new Set(allSTgenres)].map((item) =>
-    {
-        return {
-            title: item,
-            value: getOcurrences(allSTgenres, item),
-        };
-    });
+
 
     LTgenrePercentages.sort(ocurrenceSort);
-    STgenrePercentages.sort(ocurrenceSort);
     let chartData = [
         ["Genre", "Value"]
     ];
@@ -1737,20 +1716,9 @@ function UserTrends(props)
         );
     }
 
-    function asd(props)
-    {
-        return ( <
-            div >
-
-            <
-            /div>
-        )
-    }
-
     function App()
     {
         const [serverData, setServerData] = useState();
-        const [searchText, setSearchText] = useState();
 
         useEffect(() =>
         {
@@ -2077,12 +2045,6 @@ function UserTrends(props)
                     /div> <
                     UserTrends LTartists = {
                         serverData.user.favArtists.longTerm
-                    }
-                    MTartists = {
-                        serverData.user.favArtists.mediumTerm
-                    }
-                    STartists = {
-                        serverData.user.favArtists.shortTerm
                     }
                     /> <
                     RelatedArtists artists = {
